@@ -6,7 +6,7 @@ import { addAlarm, updateAlarm } from "@/app/actions/alarms";
 import { ALARM_STATUSES, type Alarm, type Machine } from "@/lib/types";
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
+  "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
 
 export function AlarmForm({
   machines,
@@ -52,15 +52,15 @@ export function AlarmForm({
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-950">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-zinc-900">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
                 {alarm ? "แก้ไข Alarm" : "บันทึก Alarm ใหม่"}
               </h3>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
               >
                 ✕
               </button>
@@ -68,7 +68,7 @@ export function AlarmForm({
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   เครื่องจักร (Machine) <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -89,7 +89,7 @@ export function AlarmForm({
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     Alarm Code <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -101,7 +101,7 @@ export function AlarmForm({
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     Date/Time เกิดเหตุ
                   </label>
                   <input
@@ -117,7 +117,7 @@ export function AlarmForm({
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   รายละเอียด Alarm (Description) <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -130,7 +130,7 @@ export function AlarmForm({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   สาเหตุ (Cause)
                 </label>
                 <textarea
@@ -142,7 +142,7 @@ export function AlarmForm({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   สถานะ (Status) <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -159,7 +159,7 @@ export function AlarmForm({
               </div>
 
               {error && (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/40 dark:text-red-300">
                   {error}
                 </p>
               )}
@@ -168,7 +168,7 @@ export function AlarmForm({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                 >
                   ยกเลิก
                 </button>

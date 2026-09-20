@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/utils/auth";
+import { requireEditor } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 import { MAINTENANCE_STATUSES, type MaintenanceStatus } from "@/lib/types";
 
@@ -10,7 +10,7 @@ export type ActionResult = { error?: string } | undefined;
 export async function addMaintenance(
   formData: FormData
 ): Promise<ActionResult> {
-  const user = await requireUser();
+  const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
   const machineId = String(formData.get("machine_id") ?? "").trim();
@@ -49,7 +49,7 @@ export async function updateMaintenance(
   id: string,
   formData: FormData
 ): Promise<ActionResult> {
-  const user = await requireUser();
+  const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
   const machineId = String(formData.get("machine_id") ?? "").trim();
@@ -91,7 +91,7 @@ export async function updateMaintenanceStatus(
   id: string,
   status: MaintenanceStatus
 ): Promise<ActionResult> {
-  const user = await requireUser();
+  const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
   if (!MAINTENANCE_STATUSES.includes(status)) return { error: "สถานะไม่ถูกต้อง" };
 
@@ -108,7 +108,7 @@ export async function updateMaintenanceStatus(
 }
 
 export async function deleteMaintenance(id: string): Promise<ActionResult> {
-  const user = await requireUser();
+  const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
   const supabase = await createClient();

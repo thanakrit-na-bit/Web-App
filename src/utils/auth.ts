@@ -45,3 +45,9 @@ export const requireAdmin = cache(async (): Promise<CurrentUser> => {
   if (user.role !== "admin") redirect("/dashboard");
   return user;
 });
+
+export const requireEditor = cache(async (): Promise<CurrentUser> => {
+  const user = await requireUser();
+  if (user.role === "viewer") redirect("/dashboard");
+  return user;
+});

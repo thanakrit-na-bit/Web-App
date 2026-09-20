@@ -53,8 +53,8 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <p className="text-sm text-zinc-500">{label}</p>
+    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+      <p className="text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
       <p className={`mt-1 text-3xl font-bold ${color}`}>{value}</p>
     </div>
   );
@@ -86,8 +86,8 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-zinc-900">Dashboard</h2>
-        <p className="text-sm text-zinc-500">
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Dashboard</h2>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           ยินดีต้อนรับ {user.full_name ?? user.email}
         </p>
       </div>
@@ -100,20 +100,20 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold text-zinc-700">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+          <h3 className="mb-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
             สถานะเครื่องจักร (Machine Status)
           </h3>
           <div className="space-y-4">
             {machineStatusBar.map((s) => (
               <div key={s.label}>
-                <div className="mb-1 flex justify-between text-xs text-zinc-500">
+                <div className="mb-1 flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
                   <span>
                     {s.label} ({s.value})
                   </span>
                   <span>{Math.round((s.value / machineTotal) * 100)}%</span>
                 </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100">
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                   <div
                     className={`h-full rounded-full ${s.color}`}
                     style={{ width: `${(s.value / machineTotal) * 100}%` }}
@@ -124,18 +124,18 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h3 className="mb-4 text-sm font-semibold text-zinc-700">สถานะ Alarm</h3>
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+          <h3 className="mb-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300">สถานะ Alarm</h3>
           <div className="space-y-4">
             {alarmStatusBar.map((s) => (
               <div key={s.label}>
-                <div className="mb-1 flex justify-between text-xs text-zinc-500">
+                <div className="mb-1 flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
                   <span>
                     {s.label} ({s.value})
                   </span>
                   <span>{Math.round((s.value / alarmTotal) * 100)}%</span>
                 </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100">
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                   <div
                     className={`h-full rounded-full ${s.color}`}
                     style={{ width: `${(s.value / alarmTotal) * 100}%` }}

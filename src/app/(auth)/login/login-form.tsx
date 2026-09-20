@@ -5,6 +5,9 @@ import { loginAction, signupAction } from "@/app/actions/auth";
 
 type Mode = "login" | "signup";
 
+const inputClass =
+  "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-blue-400 dark:focus:ring-blue-900";
+
 export function AuthForm() {
   const [mode, setMode] = useState<Mode>("login");
   const [state, action, pending] = useActionState(
@@ -13,22 +16,22 @@ export function AuthForm() {
   );
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm">
+    <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mb-6 text-center">
-        <h1 className="text-xl font-bold text-zinc-900">
+        <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
           Alarm & Maintenance System
         </h1>
-        <p className="mt-1 text-sm text-zinc-500">ระบบจัดการ Alarm และงานบำรุงรักษา</p>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">ระบบจัดการ Alarm และงานบำรุงรักษา</p>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1">
+      <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
         <button
           type="button"
           onClick={() => setMode("login")}
           className={`rounded-md py-2 text-sm font-medium transition ${
             mode === "login"
-              ? "bg-white text-zinc-900 shadow-sm"
-              : "text-zinc-500 hover:text-zinc-700"
+              ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-900 dark:text-zinc-100"
+              : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
           }`}
         >
           เข้าสู่ระบบ
@@ -38,8 +41,8 @@ export function AuthForm() {
           onClick={() => setMode("signup")}
           className={`rounded-md py-2 text-sm font-medium transition ${
             mode === "signup"
-              ? "bg-white text-zinc-900 shadow-sm"
-              : "text-zinc-500 hover:text-zinc-700"
+              ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-900 dark:text-zinc-100"
+              : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
           }`}
         >
           สมัครสมาชิก
@@ -51,7 +54,7 @@ export function AuthForm() {
           <div>
             <label
               htmlFor="full_name"
-              className="mb-1 block text-sm font-medium text-zinc-700"
+              className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
               ชื่อจริง
             </label>
@@ -60,14 +63,14 @@ export function AuthForm() {
               name="full_name"
               type="text"
               placeholder="เช่น Somchai Jaidee"
-              className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              className={inputClass}
             />
           </div>
         )}
         <div>
           <label
             htmlFor="email"
-            className="mb-1 block text-sm font-medium text-zinc-700"
+            className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
           >
             อีเมล
           </label>
@@ -77,13 +80,13 @@ export function AuthForm() {
             type="email"
             required
             placeholder="you@example.com"
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className={inputClass}
           />
         </div>
         <div>
           <label
             htmlFor="password"
-            className="mb-1 block text-sm font-medium text-zinc-700"
+            className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
           >
             รหัสผ่าน
           </label>
@@ -94,17 +97,17 @@ export function AuthForm() {
             required
             minLength={6}
             placeholder="••••••••"
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className={inputClass}
           />
         </div>
 
         {state?.error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/40 dark:text-red-300">
             {state.error}
           </p>
         )}
         {state && !state.error && mode === "signup" && (
-          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
+          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-900/40 dark:text-green-300">
             ลงทะเบียนสำเร็จ — ตรวจสอบอีเมลเพื่อยืนยันบัญชีก่อนเข้าสู่ระบบ
           </p>
         )}
@@ -122,7 +125,7 @@ export function AuthForm() {
         </button>
       </form>
 
-      <p className="mt-5 text-center text-xs text-zinc-400">
+      <p className="mt-5 text-center text-xs text-zinc-400 dark:text-zinc-500">
         User แรกที่ลงทะเบียนจะได้สิทธิ์เป็น Admin โดยอัตโนมัติ
       </p>
     </div>

@@ -1,4 +1,6 @@
-export type Role = "admin" | "technician";
+export type Role = "admin" | "technician" | "viewer";
+
+export const ROLES: Role[] = ["admin", "technician", "viewer"];
 
 export type MachineStatus = "Running" | "Stop" | "Alarm" | "Maintenance";
 export type AlarmStatus = "Open" | "In Progress" | "Closed";
@@ -70,3 +72,13 @@ export const MAINTENANCE_STATUSES: MaintenanceStatus[] = [
   "Completed",
   "Waiting Part",
 ];
+
+export type AuditLog = {
+  id: string;
+  user_email: string | null;
+  action: string;
+  target_type: string;
+  target_id: string | null;
+  details: string | null;
+  created_at: string;
+};

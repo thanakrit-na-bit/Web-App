@@ -1,14 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/utils/auth";
+import { requireEditor } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 import { ALARM_STATUSES, type AlarmStatus } from "@/lib/types";
 
 export type ActionResult = { error?: string } | undefined;
 
 export async function addAlarm(formData: FormData): Promise<ActionResult> {
-  const user = await requireUser();
+  const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
   const machineId = String(formData.get("machine_id") ?? "").trim();
@@ -46,7 +46,7 @@ export async function updateAlarm(
   id: string,
   formData: FormData
 ): Promise<ActionResult> {
-  const user = await requireUser();
+  const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
   const machineId = String(formData.get("machine_id") ?? "").trim();
@@ -86,7 +86,7 @@ export async function updateAlarmStatus(
   id: string,
   status: AlarmStatus
 ): Promise<ActionResult> {
-  const user = await requireUser();
+  const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
   if (!ALARM_STATUSES.includes(status)) return { error: "สถานะไม่ถูกต้อง" };
 
@@ -100,7 +100,7 @@ export async function updateAlarmStatus(
 }
 
 export async function deleteAlarm(id: string): Promise<ActionResult> {
-  const user = await requireUser();
+  const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
   const supabase = await createClient();

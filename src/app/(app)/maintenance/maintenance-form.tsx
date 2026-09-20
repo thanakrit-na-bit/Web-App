@@ -10,7 +10,7 @@ import {
 } from "@/lib/types";
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
+  "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
 
 export function MaintenanceForm({
   machines,
@@ -56,15 +56,15 @@ export function MaintenanceForm({
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-950">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-zinc-900">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
                 {record ? "แก้ไขงานบำรุงรักษา" : "บันทึกงานบำรุงรักษาใหม่"}
               </h3>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
               >
                 ✕
               </button>
@@ -73,7 +73,7 @@ export function MaintenanceForm({
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     เครื่องจักร <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -93,7 +93,7 @@ export function MaintenanceForm({
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     ประเภทงานซ่อม <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -115,7 +115,7 @@ export function MaintenanceForm({
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     วันที่ซ่อม
                   </label>
                   <input
@@ -129,7 +129,7 @@ export function MaintenanceForm({
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     ช่างผู้ซ่อม (Technician)
                   </label>
                   <input
@@ -141,7 +141,7 @@ export function MaintenanceForm({
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   ปัญหาที่พบ (Problem) <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -154,7 +154,7 @@ export function MaintenanceForm({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   การแก้ไข (Action Taken) <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -167,7 +167,7 @@ export function MaintenanceForm({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   สถานะ (Status) <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -184,7 +184,7 @@ export function MaintenanceForm({
               </div>
 
               {error && (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/40 dark:text-red-300">
                   {error}
                 </p>
               )}
@@ -193,7 +193,7 @@ export function MaintenanceForm({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                 >
                   ยกเลิก
                 </button>

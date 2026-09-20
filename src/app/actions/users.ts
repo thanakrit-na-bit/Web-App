@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
-import type { Role } from "@/lib/types";
+import { ROLES, type Role } from "@/lib/types";
 
 export type ActionResult = { error?: string } | undefined;
 
@@ -13,7 +13,7 @@ export async function updateUserRole(
 ): Promise<ActionResult> {
   const user = await requireAdmin();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
-  if (role !== "admin" && role !== "technician") {
+  if (!ROLES.includes(role)) {
     return { error: "Role ไม่ถูกต้อง" };
   }
 

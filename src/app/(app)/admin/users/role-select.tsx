@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateUserRole } from "@/app/actions/users";
 import type { Role } from "@/lib/types";
+import { ROLES } from "@/lib/types";
 
 export function RoleSelect({
   userId,
@@ -33,15 +34,18 @@ export function RoleSelect({
 
   return (
     <div className="flex items-center gap-2">
-      <select
-        value={selected}
-        disabled={pending}
-        onChange={(e) => handleChange(e.target.value as Role)}
-        className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 disabled:opacity-60"
-      >
-        <option value="technician">Technician</option>
-        <option value="admin">Admin</option>
-      </select>
+<select
+          value={selected}
+          disabled={pending}
+          onChange={(e) => handleChange(e.target.value as Role)}
+          className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        >
+          {ROLES.map((r) => (
+            <option key={r} value={r}>
+              {r === "admin" ? "Admin" : r === "technician" ? "Technician" : "Viewer"}
+            </option>
+          ))}
+        </select>
       {message && (
         <span
           className={`text-xs ${
