@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Alarm & Maintenance Management System
 
-## Getting Started
+ระบบจัดการเครื่องจักร แจ้งเตือน (Alarm) และงานบำรุงรักษา (Maintenance) สำหรับรายวิชา Programming in Automation Systems
 
-First, run the development server:
+## Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend:** Next.js 16 (App Router, Turbopack) + Tailwind CSS + TypeScript
+- **Backend/DB:** Supabase (PostgreSQL + Auth + Row Level Security)
+- **CI/CD:** GitHub Actions + Vercel
+- **Version Control:** GitHub
+
+## Features
+
+- Login / Logout ด้วย Supabase Auth
+- 2 บทบาท: **Admin** และ **Technician**
+- RLS ตามบทบาท (Admin อ่าน/เขียนได้ทุกแถว, Technician อ่านได้และเขียนเฉพาะงานที่ได้รับมอบหมาย)
+- จัดการ **Machine** (CRUD: ชื่อ, ประเภท, สถานะ, วันที่ติดตั้ง)
+- จัดการ **Alarm** (CRUD: เชื่อมโยงเครื่องจักร, ระดับความรุนแรง, สถานะ, หมายเหตุ)
+- จัดการ **Maintenance** (CRUD: ประเภทงาน, ผู้รับผิดชอบ, กำหนดการ, ผลการซ่อม)
+- Search & Filter (ค้นหา + กรองตามสถานะ/ระดับ อย่างน้อย 2 เงื่อนไข)
+- Dashboard สรุปยอดรวม (เครื่องจักร, แจ้งเตือนที่ค้าง, งานบำรุงรักษา)
+- หน้า Admin จัดการบทบาทผู้ใช้ (โบนัส)
+- Input Validation ทั้งฝั่ง client และ server
+
+## Project Structure
+
+```
+alarm-maint-app/
+├── src/
+│   ├── app/
+│   │   ├── (app)/          # หน้าหลัง login (dashboard, machines, alarms, maintenance, admin)
+│   │   ├── (auth)/login/   # หน้าเข้าสู่ระบบ
+│   │   └── actions/        # Server Actions
+│   ├── components/         # UI components
+│   ├── lib/                # types & utilities
+│   ├── proxy.ts            # Middleware (Next.js 16)
+│   └── utils/supabase/     # client / server / middleware helpers
+├── supabase/schema.sql     # Database schema + RLS policies
+└── .github/workflows/ci.yml
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting Started (Local)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+cp .env.example .env.local   # ใส่ค่า Supabase URL + anon key
+npm run dev                  # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### สร้าง Database
 
-## Learn More
+เปิด `supabase/schema.sql` ที่ Supabase Dashboard → **SQL Editor** → Run (รันซ้ำได้)
 
-To learn more about Next.js, take a look at the following resources:
+### สร้างผู้ใช้แรก
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`Authentication → Users → Add user` (ผู้ใช้คนแรกจะได้เป็น Admin อัตโนมัติ)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## CI / CD
 
-## Deploy on Vercel
+- **GitHub Actions:** `install → lint → build` อัตโนมัติทุกครั้งที่ push (`.github/workflows/ci.yml`)
+- **Vercel:** ระบบ deploy อัตโนมัติทุกครั้งที่ push ขึ้น branch `main`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployed
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Vercel: _จะแจ้ง URL หลัง deploy_
+
+## Supabase Schema
+
+ตาราง: `profiles`, `machines`, `alarms`, `maintenance_records` — รายละเอียดใน `supabase/schema.sql`
