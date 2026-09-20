@@ -1,0 +1,214 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { addMaintenance, updateMaintenance } from "@/app/actions/maintenance";
+import {
+  MAINTENANCE_STATUSES,
+  type Machine,
+  type Maintenance,
+} from "@/lib/types";
+
+const inputClass =
+  "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200";
+
+export function MaintenanceForm({
+  machines,
+  record,
+}: {
+  machines: Pick<Machine, "id" | "machine_id" | "machine_name">[];
+  record?: Maintenance;
+}) {
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [pending, setPending] = useState(false);
+  const router = useRouter();
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setPending(true);
+    setError("");
+    const formData = new FormData(e.currentTarget);
+    const result = record
+      ? await updateMaintenance(record.id, formData)
+      : await addMaintenance(formData);
+    setPending(false);
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      setOpen(false);
+      router.refresh();
+    }
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => {
+          setError("");
+          setOpen(true);
+        }}
+        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+      >
+        {record ? "แก้ไข" : "➕ บันทึกงานซ่อม"}
+      </button>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-zinc-900">
+                {record ? "แก้ไขงานบำรุงรักษา" : "บันทึกงานบำรุงรักษาใหม่"}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                    เครื่องจักร <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="machine_id"
+                    required
+                    defaultValue={record?.machine_id ?? ""}
+                    className={inputClass}
+                  >
+                    <option value="" disabled>
+                      -- เลือกเครื่องจักร --
+                    </option>
+                    {machines.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.machine_id} - {m.machine_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                    ประเภทงานซ่อม <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="maintenance_type"
+                    required
+                    defaultValue={record?.maintenance_type ?? ""}
+                    className={inputClass}
+                  >
+                    <option value="" disabled>
+                      -- เลือก --
+                    </option>
+                    <option>Preventive</option>
+                    <option>Corrective</option>
+                    <option>Predictive</option>
+                    <option>Breakdown</option>
+                    <option>Inspection</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                    วันที่ซ่อม
+                  </label>
+                  <input
+                    name="maintenance_date"
+                    type="date"
+                    defaultValue={
+                      record?.maintenance_date ??
+                      new Date().toISOString().slice(0, 10)
+                    }
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-zinc-700">
+                    ช่างผู้ซ่อม (Technician)
+                  </label>
+                  <input
+                    name="technician"
+                    defaultValue={record?.technician ?? ""}
+                    placeholder="เช่น Somchai"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  ปัญหาที่พบ (Problem) <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="problem"
+                  required
+                  rows={2}
+                  defaultValue={record?.problem}
+                  placeholder="เช่น Spindle มีเสียงผิดปกติ"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  การแก้ไข (Action Taken) <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="action_taken"
+                  required
+                  rows={2}
+                  defaultValue={record?.action_taken}
+                  placeholder="เช่น เปลี่ยน bearing ใหม่"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-zinc-700">
+                  สถานะ (Status) <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="status"
+                  defaultValue={record?.status ?? "Scheduled"}
+                  className={inputClass}
+                >
+                  {MAINTENANCE_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {error && (
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                  {error}
+                </p>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  disabled={pending}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                >
+                  {pending ? "กำลังบันทึก..." : "บันทึก"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
