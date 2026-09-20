@@ -60,6 +60,18 @@ npm run dev                  # http://localhost:3000
 - **GitHub Actions:** `install → lint → build` อัตโนมัติทุกครั้งที่ push (`.github/workflows/ci.yml`)
 - **Vercel:** ระบบ deploy อัตโนมัติทุกครั้งที่ push ขึ้น branch `main`
 
+## การใช้งาน AI ในการพัฒนา
+
+โปรเจกต์นี้พัฒนาโดยใช้ AI ช่วยในทุกขั้นตอนตามที่ใบงานกำหนด:
+
+- **วิเคราะห์ Requirement:** ให้ AI อ่าน PDF ใบงาน สรุปขอบเขตงาน เทคโนโลยีที่ต้องใช้ และเกณฑ์การให้คะแนน
+- **ออกแบบ Database:** AI เขียน SQL schema (ตาราง profiles, machines, alarms, maintenance_records) พร้อม RLS policies ตามบทบาท Admin / Technician
+- **เขียน Source Code:** ให้ AI เขียนโค้ด Next.js 16 (App Router + Server Actions + Supabase) ทั้งระบบ Auth, CRUD, Search/Filter, Dashboard และหน้า Admin
+- **สร้าง UI/UX:** ใช้ Tailwind CSS ทำ UI ส่วนใหญ่ผ่านการสั่งงานด้วย AI
+- **เขียน SQL:** มีการปรับ schema SQL หลายรอบ เพื่อให้รันซ้ำได้โดยไม่ error (DROP IF EXISTS)
+- **Debug และแก้ Error:** AI วินิจฉัย error จาก Supabase (policy ผิด, syntax error), ปัญหาชื่อโฟลเดอร์ npm, breaking changes ของ Next.js 16
+- **Deploy:** ใช้ AI สั่งงานผ่าน CLI เพื่อ push GitHub และ deploy ขึ้น Vercel
+
 ## Deployed
 
 - **Vercel:** https://alarm-maint-app.vercel.app
