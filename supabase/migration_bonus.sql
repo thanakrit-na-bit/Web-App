@@ -1,7 +1,7 @@
--- ============================================================
+﻿-- ============================================================
 -- Bonus Features Migration - Role Viewer + Audit Log
 -- วางโค้ดนี้ลงใน Supabase Dashboard > SQL Editor แล้ว Run ต่อจาก schema.sql
--- โค้ดนี้รันซ้ำได้ (idempotent)
+-- โค้ดนี้รันซ้ำได้ (idempotent) - กด Run ได้หลายครั้งไม่ error
 -- ============================================================
 
 -- ---------- 1) เพิ่ม Role 'viewer' ให้ profiles ----------
@@ -11,7 +11,7 @@ declare
 begin
   select conname into c
     from pg_constraint
-   where conrelid = 'public.profiles'::regclass and contype = 'c';
+   where conrelid = 'public.profiles'::regclass and contype = 'c' and conname = 'profiles_role_check';
   if c.conname is not null then
     execute format('alter table public.profiles drop constraint %I', c.conname);
   end if;
@@ -22,6 +22,7 @@ alter table public.profiles
 
 -- ---------- 2) ป้องกัน Viewer แก้ไข Alarm (editor = admin/technician) ----------
 drop policy if exists "alarms_insert_authenticated" on public.alarms;
+drop policy if exists "alarms_insert_editor" on public.alarms;
 create policy "alarms_insert_editor" on public.alarms
   for insert to authenticated with check (
     exists (
@@ -31,6 +32,7 @@ create policy "alarms_insert_editor" on public.alarms
   );
 
 drop policy if exists "alarms_update_authenticated" on public.alarms;
+drop policy if exists "alarms_update_editor" on public.alarms;
 create policy "alarms_update_editor" on public.alarms
   for update to authenticated using (
     exists (
@@ -40,6 +42,7 @@ create policy "alarms_update_editor" on public.alarms
   );
 
 drop policy if exists "alarms_delete_authenticated" on public.alarms;
+drop policy if exists "alarms_delete_editor" on public.alarms;
 create policy "alarms_delete_editor" on public.alarms
   for delete to authenticated using (
     exists (
@@ -50,6 +53,7 @@ create policy "alarms_delete_editor" on public.alarms
 
 -- ---------- 3) ป้องกัน Viewer แก้ไขงานบำรุงรักษา ----------
 drop policy if exists "maintenance_insert_authenticated" on public.maintenance_records;
+drop policy if exists "maintenance_insert_editor" on public.maintenance_records;
 create policy "maintenance_insert_editor" on public.maintenance_records
   for insert to authenticated with check (
     exists (
@@ -59,6 +63,7 @@ create policy "maintenance_insert_editor" on public.maintenance_records
   );
 
 drop policy if exists "maintenance_update_authenticated" on public.maintenance_records;
+drop policy if exists "maintenance_update_editor" on public.maintenance_records;
 create policy "maintenance_update_editor" on public.maintenance_records
   for update to authenticated using (
     exists (
@@ -68,6 +73,7 @@ create policy "maintenance_update_editor" on public.maintenance_records
   );
 
 drop policy if exists "maintenance_delete_authenticated" on public.maintenance_records;
+drop policy if exists "maintenance_delete_editor" on public.maintenance_records;
 create policy "maintenance_delete_editor" on public.maintenance_records
   for delete to authenticated using (
     exists (
