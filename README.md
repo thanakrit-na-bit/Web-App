@@ -62,7 +62,8 @@ npm run dev                  # http://localhost:3000
 
 ## Deployed
 
-- Vercel: _จะแจ้ง URL หลัง deploy_
+- **Vercel:** https://alarm-maint-app.vercel.app
+- **GitHub:** https://github.com/thanakrit-na-bit/Web-App
 
 ## Supabase Schema
 
