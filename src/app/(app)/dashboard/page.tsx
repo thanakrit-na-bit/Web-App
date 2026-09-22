@@ -50,15 +50,26 @@ function StatCard({
   label,
   value,
   color,
+  icon,
+  chip,
 }: {
   label: string;
   value: number;
   color: string;
+  icon: string;
+  chip: string;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
-      <p className={`mt-1 text-3xl font-bold ${color}`}>{value}</p>
+    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
+        <span
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-lg ${chip}`}
+        >
+          {icon}
+        </span>
+      </div>
+      <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
     </div>
   );
 }
@@ -107,23 +118,55 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Dashboard</h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          ยินดีต้อนรับ {user.full_name ?? user.email}
-        </p>
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-xl shadow-sm">
+          👋
+        </span>
+        <div>
+          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Dashboard</h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            ยินดีต้อนรับ {user.full_name ?? user.email} กลับมา
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard label="เครื่องจักรทั้งหมด" value={stats.machines} color="text-zinc-900" />
-        <StatCard label="เครื่องจักรแจ้ง Alarm" value={stats.machineAlarm} color="text-red-600" />
-        <StatCard label="รายการ Alarm ทั้งหมด" value={stats.alarms} color="text-orange-600" />
-        <StatCard label="งานบำรุงรักษา" value={stats.maintenance} color="text-blue-600" />
+        <StatCard
+          label="เครื่องจักรทั้งหมด"
+          value={stats.machines}
+          color="text-zinc-900 dark:text-zinc-100"
+          icon="🏭"
+          chip="bg-zinc-100 dark:bg-zinc-800"
+        />
+        <StatCard
+          label="เครื่องจักรแจ้ง Alarm"
+          value={stats.machineAlarm}
+          color="text-red-600 dark:text-red-400"
+          icon="🚨"
+          chip="bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
+        />
+        <StatCard
+          label="รายการ Alarm ทั้งหมด"
+          value={stats.alarms}
+          color="text-orange-600 dark:text-orange-400"
+          icon="⚠️"
+          chip="bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400"
+        />
+        <StatCard
+          label="งานบำรุงรักษา"
+          value={stats.maintenance}
+          color="text-blue-600 dark:text-blue-400"
+          icon="🔧"
+          chip="bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
+        />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <h3 className="mb-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100 text-sm dark:bg-zinc-800">
+              📦
+            </span>
             สถานะเครื่องจักร (Machine Status)
           </h3>
           <div className="space-y-4">
@@ -147,7 +190,12 @@ export default async function DashboardPage() {
         </div>
 
         <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <h3 className="mb-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300">สถานะ Alarm</h3>
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100 text-sm dark:bg-zinc-800">
+              ⏱️
+            </span>
+            สถานะ Alarm
+          </h3>
           <div className="space-y-4">
             {alarmStatusBar.map((s) => (
               <div key={s.label}>
@@ -172,7 +220,10 @@ export default async function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-100 text-sm dark:bg-red-900/40">
+                🚨
+              </span>
               Alarm ที่ยังเปิดอยู่
             </h3>
             <Link
@@ -210,7 +261,10 @@ export default async function DashboardPage() {
 
         <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-sm dark:bg-blue-900/40">
+                🔧
+              </span>
               งานซ่อมที่ถึงกำหนด
             </h3>
             <Link

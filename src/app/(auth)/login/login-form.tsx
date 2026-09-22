@@ -26,8 +26,11 @@ export function AuthForm() {
   const isForgot = mode === "forgot";
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="w-full max-w-sm rounded-2xl border border-zinc-200/80 bg-white p-8 shadow-xl shadow-blue-900/5 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40">
       <div className="mb-6 text-center">
+        <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-2xl shadow-md shadow-blue-600/20">
+          ⚙️
+        </span>
         <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
           Alarm & Maintenance System
         </h1>
@@ -138,7 +141,7 @@ export function AuthForm() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/30 transition hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending
             ? "กำลังดำเนินการ..."
