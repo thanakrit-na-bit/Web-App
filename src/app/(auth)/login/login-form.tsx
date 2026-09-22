@@ -23,6 +23,15 @@ export function AuthForm() {
     undefined
   );
 
+  const [knownEmails] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      return JSON.parse(localStorage.getItem("known_emails") ?? "[]");
+    } catch {
+      return [];
+    }
+  });
+
   const isForgot = mode === "forgot";
 
   return (
@@ -93,14 +102,33 @@ export function AuthForm() {
           >
             อีเมล
           </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            placeholder="you@example.com"
-            className={inputClass}
-          />
+          {isForgot && knownEmails.length > 0 ? (
+            <select
+              id="email"
+              name="email"
+              required
+              defaultValue=""
+              className={inputClass}
+            >
+              <option value="" disabled>
+                — เลือกอีเมลที่ต้องการรีเซ็ต —
+              </option>
+              {knownEmails.map((email) => (
+                <option key={email} value={email}>
+                  {email}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              placeholder="you@example.com"
+              className={inputClass}
+            />
+          )}
         </div>
         {!isForgot ? (
           <div>

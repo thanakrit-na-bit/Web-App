@@ -3,6 +3,7 @@ import { requireUser } from "@/utils/auth";
 import { logoutAction } from "@/app/actions/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NavLink } from "@/components/nav-link";
+import { RememberEmail } from "@/components/remember-email";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: "📊" },
@@ -99,7 +100,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-x-hidden p-6">{children}</main>
+      <main className="flex-1 overflow-x-hidden p-6">
+        <RememberEmail />
+        {children}
+      </main>
     </div>
   );
 }
