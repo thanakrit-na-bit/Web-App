@@ -2,6 +2,7 @@ import { requireAdmin } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 import type { Profile } from "@/lib/types";
 import { RoleSelect } from "./role-select";
+import { ResetPasswordButton } from "./reset-password-button";
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString("en-GB");
@@ -42,13 +43,14 @@ export default async function AdminUsersPage() {
               <tr>
                 <th className="px-4 py-3">ชื่อ</th>
                 <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3">รีเซ็ตรหัสผ่าน</th>
                 <th className="px-4 py-3">สมัครเมื่อ</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-8 text-center text-zinc-400">
+                  <td colSpan={4} className="px-4 py-8 text-center text-zinc-400">
                     ไม่พบผู้ใช้งาน
                   </td>
                 </tr>
@@ -65,6 +67,9 @@ export default async function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <RoleSelect userId={p.id} role={p.role} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <ResetPasswordButton userId={p.id} />
                     </td>
                     <td className="px-4 py-3 text-sm text-zinc-500 dark:text-zinc-400">
                       {formatDate(p.created_at)}
