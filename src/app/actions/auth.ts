@@ -116,3 +116,42 @@ export async function updatePasswordAction(
 
   return { ok: true };
 }
+
+export async function changePasswordAction(
+  _prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
+  const current = String(formData.get("current_password") ?? "");
+  const password = String(formData.get("password") ?? "");
+
+  if (!current || !password) {
+    return { error: "กรุณากรอกให้ครบทั้ง 2 ช่อง" };
+  }
+  if (password.length < 6) {
+    return { error: "รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.email) {
+    return { error: "กรุณาเข้าสู่ระบบก่อนเปลี่ยนรหัสผ่าน" };
+  }
+
+  const { error: signInErr } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: current,
+  });
+  if (signInErr) {
+    return { error: "รหัสผ่านปัจจุบันไม่ถูกต้อง" };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    return { error: "เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่ภายหลัง" };
+  }
+
+  return { ok: true };
+}

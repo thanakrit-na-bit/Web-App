@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireUser } from "@/utils/auth";
 import { logoutAction } from "@/app/actions/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -81,7 +82,13 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
               </span>
             </div>
           </div>
-          <form action={logoutAction}>
+          <form action={logoutAction} className="space-y-2">
+            <Link
+              href="/change-password"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            >
+              🔑 เปลี่ยนรหัสผ่าน
+            </Link>
             <button
               type="submit"
               className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
