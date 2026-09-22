@@ -88,11 +88,7 @@ export async function requestPasswordResetAction(
   });
 
   if (error) {
-    const msg = error.message.toLowerCase();
-    if (msg.includes("rate") || msg.includes("security") || msg.includes("60 second") || msg.includes("too many")) {
-      return { error: "ขอลิงก์บ่อยเกินไป กรุณารอประมาณ 1 นาที แล้วลองอีกครั้ง" };
-    }
-    return { error: "อีเมลนี้ไม่ตรงกับบัญชีในระบบ ตรวจสอบตัวสะกด (ตัวเล็ก-ตัวใหญ่) แล้วลองใหม่" };
+    return { error: error.message };
   }
 
   return { ok: true };
