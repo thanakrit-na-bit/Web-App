@@ -88,7 +88,9 @@ export async function requestPasswordResetAction(
   });
 
   if (error) {
-    return { error: "ไม่พบอีเมลนี้ในระบบ กรุณาตรวจสอบอีกครั้ง" };
+    return { error: error.message.includes("rate")
+      ? "ขออภัย ขอลิงก์รีเซ็ตได้อีกครั้งในหนึ่งนาทีข้างหน้า"
+      : "อีเมลนี้ไม่ตรงกับบัญชีในระบบ ตรวจสอบตัวสะกดแล้วลองใหม่" };
   }
 
   return { ok: true };
