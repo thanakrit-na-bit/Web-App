@@ -88,9 +88,11 @@ export async function requestPasswordResetAction(
   });
 
   if (error) {
-    return { error: error.message.includes("rate")
-      ? "ขออภัย ขอลิงก์รีเซ็ตได้อีกครั้งในหนึ่งนาทีข้างหน้า"
-      : "อีเมลนี้ไม่ตรงกับบัญชีในระบบ ตรวจสอบตัวสะกดแล้วลองใหม่" };
+    const msg = error.message.toLowerCase();
+    if (msg.includes("rate") || msg.includes("security") || msg.includes("60 second") || msg.includes("too many")) {
+      return { error: "ขอลิงก์บ่อยเกินไป กรุณารอประมาณ 1 นาที แล้วลองอีกครั้ง" };
+    }
+    return { error: "อีเมลนี้ไม่ตรงกับบัญชีในระบบ ตรวจสอบตัวสะกด (ตัวเล็ก-ตัวใหญ่) แล้วลองใหม่" };
   }
 
   return { ok: true };
