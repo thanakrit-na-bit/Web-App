@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isPublic = path === "/login";
+  const isPublic = path === "/login" || path === "/reset-password";
 
   // Redirect unauthenticated users to /login
   if (!user && !isPublic) {

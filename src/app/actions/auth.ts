@@ -1,9 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 
-export type LoginState = { error?: string } | undefined;
+export type LoginState = { error?: string; ok?: boolean } | undefined;
+
+async function siteUrl() {
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+  return `${proto}://${host}`;
+}
 
 export async function loginAction(
   _prevState: LoginState,
@@ -63,4 +71,44 @@ export async function logoutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+export async function requestPasswordResetAction(
+  _prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) {
+    return { error: "กรุณากรอกอีเมล" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${await siteUrl()}/reset-password`,
+  });
+
+  if (error) {
+    return { error: "ไม่พบอีเมลนี้ในระบบ กรุณาตรวจสอบอีกครั้ง" };
+  }
+
+  return { ok: true };
+}
+
+export async function updatePasswordAction(
+  _prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
+  const password = String(formData.get("password") ?? "");
+  if (password.length < 6) {
+    return { error: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: "ลิงก์หมดอายุหรือหมดสิทธิ์ กรุณาขอลิงก์รีเซ็ตใหม่อีกครั้ง" };
+  }
+
+  return { ok: true };
 }

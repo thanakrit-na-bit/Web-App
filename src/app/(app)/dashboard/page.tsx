@@ -1,6 +1,9 @@
 import { cache } from "react";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { requireUser } from "@/utils/auth";
+import { StatusBadge } from "@/components/status-badge";
+import type { Alarm, Maintenance } from "@/lib/types";
 
 const getStats = cache(async () => {
   const supabase = await createClient();
@@ -63,6 +66,25 @@ function StatCard({
 export default async function DashboardPage() {
   const user = await requireUser();
   const stats = await getStats();
+  const supabase = await createClient();
+
+  const [recentAlarmsRes, upcomingMaintenanceRes] = await Promise.all([
+    supabase
+      .from("alarms")
+      .select("*, machines(machine_id, machine_name)")
+      .neq("status", "Closed")
+      .order("occurred_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("maintenance_records")
+      .select("*, machines(machine_id, machine_name)")
+      .in("status", ["Scheduled", "In Progress"])
+      .order("maintenance_date", { ascending: true })
+      .limit(5),
+  ]);
+
+  const recentAlarms = (recentAlarmsRes.data ?? []) as Alarm[];
+  const upcomingMaintenance = (upcomingMaintenanceRes.data ?? []) as Maintenance[];
 
   if (!stats) {
     return <p className="text-sm text-red-600">ไม่สามารถโหลดข้อมูลได้</p>;
@@ -144,6 +166,79 @@ export default async function DashboardPage() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              Alarm ที่ยังเปิดอยู่
+            </h3>
+            <Link
+              href="/alarms"
+              className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+            >
+              ดูทั้งหมด →
+            </Link>
+          </div>
+          {recentAlarms.length === 0 ? (
+            <p className="text-sm text-zinc-400">ไม่มี Alarm ค้างอยู่ 🎉</p>
+          ) : (
+            <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {recentAlarms.map((a) => (
+                <li key={a.id} className="flex items-center justify-between gap-2 py-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                      {a.alarm_code} · {a.machines?.machine_id}
+                    </p>
+                    <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                      {new Date(a.occurred_at).toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <StatusBadge status={a.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              งานซ่อมที่ถึงกำหนด
+            </h3>
+            <Link
+              href="/maintenance"
+              className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+            >
+              ดูทั้งหมด →
+            </Link>
+          </div>
+          {upcomingMaintenance.length === 0 ? (
+            <p className="text-sm text-zinc-400">ไม่มีงานซ่อมค้างอยู่</p>
+          ) : (
+            <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {upcomingMaintenance.map((r) => (
+                <li key={r.id} className="flex items-center justify-between gap-2 py-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                      {r.maintenance_date} · {r.machines?.machine_id}
+                    </p>
+                    <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                      {r.problem}
+                    </p>
+                  </div>
+                  <StatusBadge status={r.status} />
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>
