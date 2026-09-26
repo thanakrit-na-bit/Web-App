@@ -35,13 +35,13 @@ export function AuthForm() {
   const isForgot = mode === "forgot";
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border border-zinc-200/80 bg-white p-8 shadow-xl shadow-blue-900/5 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40">
+    <div className="animate-rise w-full max-w-sm rounded-2xl border border-zinc-200/80 bg-white/90 p-8 shadow-xl shadow-blue-900/5 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 dark:shadow-black/40">
       <div className="mb-6 text-center">
-        <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-2xl shadow-md shadow-blue-600/20">
+        <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-2xl shadow-md shadow-blue-600/25">
           ⚙️
         </span>
-        <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-          Alarm & Maintenance System
+        <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          Alarm &amp; Maintenance System
         </h1>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           {isForgot
@@ -202,9 +202,21 @@ export function AuthForm() {
       </div>
 
       {!isForgot && (
-        <p className="mt-5 text-center text-xs text-zinc-400 dark:text-zinc-500">
-          User แรกที่ลงทะเบียนจะได้สิทธิ์เป็น Admin โดยอัตโนมัติ
-        </p>
+        <div className="mt-6 border-t border-zinc-100 pt-4 text-center dark:border-zinc-800">
+          <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+            User แรกที่ลงทะเบียนจะได้สิทธิ์เป็น Admin โดยอัตโนมัติ
+          </p>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+            {["Next.js", "Tailwind CSS", "Supabase", "Vercel"].map((tech) => (
+              <span
+                key={tech}
+                className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 text-[11px] font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

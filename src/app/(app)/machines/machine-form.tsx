@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { addMachine, updateMachine } from "@/app/actions/machines";
 import { MACHINE_STATUSES, type Machine } from "@/lib/types";
+import { Modal } from "@/components/modal";
 
 const inputClass =
   "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
@@ -13,7 +14,7 @@ export function MachineForm({ machine }: { machine?: Machine }) {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const router = useRouter();
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const FORM_ID = `machine-form-${useId()}`;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,31 +41,38 @@ export function MachineForm({ machine }: { machine?: Machine }) {
           setError("");
           setOpen(true);
         }}
-        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+        className="rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-95"
       >
         {machine ? "แก้ไข" : "➕ เพิ่มเครื่องจักร"}
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div
-            ref={dialogRef}
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-950"
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {machine ? "แก้ไขเครื่องจักร" : "เพิ่มเครื่องจักรใหม่"}
-              </h3>
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          title={machine ? "แก้ไขเครื่องจักร" : "เพิ่มเครื่องจักรใหม่"}
+          description="Machine ID ต้องไม่ซ้ำกับข้อมูลที่มีอยู่ในระบบ"
+          footer={
+            <>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
               >
-                ✕
+                ยกเลิก
               </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
+              <button
+                type="submit"
+                form={FORM_ID}
+                disabled={pending}
+                className="rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+              >
+                {pending ? "กำลังบันทึก..." : "บันทึก"}
+              </button>
+            </>
+          }
+        >
+          <form id={FORM_ID} onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Machine ID <span className="text-red-500">*</span>
@@ -135,26 +143,8 @@ export function MachineForm({ machine }: { machine?: Machine }) {
                   {error}
                 </p>
               )}
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  type="submit"
-                  disabled={pending}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
-                >
-                  {pending ? "กำลังบันทึก..." : "บันทึก"}
-                </button>
-              </div>
             </form>
-          </div>
-        </div>
+        </Modal>
       )}
     </>
   );

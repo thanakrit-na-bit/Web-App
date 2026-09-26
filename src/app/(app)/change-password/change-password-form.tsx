@@ -11,13 +11,22 @@ export function ChangePasswordForm() {
   const [state, action, pending] = useActionState(changePasswordAction, undefined);
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">เปลี่ยนรหัสผ่าน</h2>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-        กรอกรหัสผ่านปัจจุบันเพื่อยืนยันตัวตน
-      </p>
+    <div className="surface animate-rise p-6">
+      <div className="mb-5 flex items-center gap-3">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-xl shadow-sm shadow-blue-600/20">
+          🔑
+        </span>
+        <div>
+          <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            เปลี่ยนรหัสผ่าน
+          </h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            กรอกรหัสผ่านปัจจุบันเพื่อยืนยันตัวตน
+          </p>
+        </div>
+      </div>
 
-      <form action={action} className="mt-5 space-y-4">
+      <form action={action} className="space-y-4">
         <div>
           <label
             htmlFor="current_password"
@@ -66,7 +75,7 @@ export function ChangePasswordForm() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/25 transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? "กำลังเปลี่ยน..." : "เปลี่ยนรหัสผ่าน"}
         </button>

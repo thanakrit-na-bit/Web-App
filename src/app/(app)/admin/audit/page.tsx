@@ -1,6 +1,8 @@
 import { requireAdmin } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 import type { AuditLog } from "@/lib/types";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 
 function formatDateTime(value: string) {
   const d = new Date(value);
@@ -48,19 +50,16 @@ export default async function AdminAuditPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-          Audit Log
-        </h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          บันทึกการเพิ่ม / แก้ไข / ลบ ข้อมูลทั้งหมดในระบบ (แสดง 200 รายการล่าสุด)
-        </p>
-      </div>
+      <PageHeader
+        icon="📜"
+        title="Audit Log"
+        description="บันทึกการเพิ่ม / แก้ไข / ลบ ข้อมูลทั้งหมดในระบบ (แสดง 200 รายการล่าสุด)"
+      />
 
-      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="overflow-x-auto">
+      <div className="surface animate-rise overflow-hidden">
+        <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50 text-xs uppercase text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+            <thead className="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/95 text-xs uppercase tracking-wide text-zinc-500 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-400">
               <tr>
                 <th className="px-4 py-3">Date/Time</th>
                 <th className="px-4 py-3">ผู้ใช้งาน</th>
@@ -72,13 +71,17 @@ export default async function AdminAuditPage() {
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-zinc-400">
-                    ยังไม่มีรายการ Audit Log
+                  <td colSpan={5} className="p-5">
+                    <EmptyState
+                      icon="📜"
+                      title="ยังไม่มีรายการ Audit Log"
+                      hint="ทุกการเพิ่ม / แก้ไข / ลบ ข้อมูลจะถูกบันทึกไว้ที่นี่โดยอัตโนมัติ"
+                    />
                   </td>
                 </tr>
               ) : (
                 rows.map((log) => (
-                  <tr key={log.id} className="align-top hover:bg-zinc-50 dark:hover:bg-zinc-900">
+                  <tr key={log.id} className="align-top transition-colors hover:bg-blue-50/40 dark:hover:bg-zinc-900/60">
                     <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
                       {formatDateTime(log.created_at)}
                     </td>

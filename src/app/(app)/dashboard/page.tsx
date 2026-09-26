@@ -3,6 +3,12 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { requireUser } from "@/utils/auth";
 import { StatusBadge } from "@/components/status-badge";
+import { AlarmTrendChart } from "@/components/alarm-trend-chart";
+import { Card, CardTitle } from "@/components/card";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
+import { buildAlarmTrend, buildStatusSummary } from "@/lib/analytics";
+import { buildNotifications } from "@/lib/notifications";
 import type { Alarm, Maintenance } from "@/lib/types";
 
 const getStats = cache(async () => {
@@ -52,24 +58,52 @@ function StatCard({
   color,
   icon,
   chip,
+  delay = 0,
 }: {
   label: string;
   value: number;
   color: string;
   icon: string;
   chip: string;
+  delay?: number;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">{label}</p>
+    <div
+      className="surface animate-rise group relative overflow-hidden p-5 transition hover:-translate-y-0.5 hover:shadow-lg"
+      style={delay ? { animationDelay: `${delay}ms` } : undefined}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-sm leading-tight text-zinc-500 dark:text-zinc-400">{label}</p>
         <span
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-lg ${chip}`}
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg transition group-hover:scale-105 ${chip}`}
         >
           {icon}
         </span>
       </div>
-      <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
+      <p className={`mt-3 text-3xl font-bold tabular-nums tracking-tight ${color}`}>{value}</p>
+    </div>
+  );
+}
+
+function StatusBar({ slices }: { slices: { label: string; value: number; percent: number; color: string }[] }) {
+  return (
+    <div className="space-y-3.5">
+      {slices.map((s) => (
+        <div key={s.label}>
+          <div className="mb-1.5 flex items-center justify-between text-xs">
+            <span className="font-medium text-zinc-600 dark:text-zinc-300">
+              {s.label} <span className="tabular-nums text-zinc-400">({s.value})</span>
+            </span>
+            <span className="tabular-nums text-zinc-400">{s.percent}%</span>
+          </div>
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+            <div
+              className={`h-full rounded-full ${s.color} transition-[width] duration-700 ease-out`}
+              style={{ width: `${s.percent}%` }}
+            />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -79,7 +113,7 @@ export default async function DashboardPage() {
   const stats = await getStats();
   const supabase = await createClient();
 
-  const [recentAlarmsRes, upcomingMaintenanceRes] = await Promise.all([
+  const [recentAlarmsRes, upcomingMaintenanceRes, trendAlarmsRes] = await Promise.all([
     supabase
       .from("alarms")
       .select("*, machines(machine_id, machine_name)")
@@ -92,43 +126,65 @@ export default async function DashboardPage() {
       .in("status", ["Scheduled", "In Progress"])
       .order("maintenance_date", { ascending: true })
       .limit(5),
+    supabase
+      .from("alarms")
+      .select("occurred_at, status")
+      .order("occurred_at", { ascending: false })
+      .limit(500),
   ]);
 
   const recentAlarms = (recentAlarmsRes.data ?? []) as Alarm[];
   const upcomingMaintenance = (upcomingMaintenanceRes.data ?? []) as Maintenance[];
+  const trend = buildAlarmTrend(
+    (trendAlarmsRes.data ?? []) as { occurred_at: string; status: string }[]
+  );
+
+  const alertNotifications = buildNotifications({
+    alarms: (recentAlarms as Alarm[]).map((a) => ({
+      id: a.id,
+      alarm_code: a.alarm_code,
+      status: a.status,
+      occurred_at: a.occurred_at,
+      machineLabel: a.machines?.machine_id ?? null,
+    })),
+    maintenance: (upcomingMaintenance as Maintenance[]).map((m) => ({
+      id: m.id,
+      status: m.status,
+      maintenance_date: m.maintenance_date,
+      machineLabel: m.machines?.machine_id ?? null,
+    })),
+  });
 
   if (!stats) {
     return <p className="text-sm text-red-600">ไม่สามารถโหลดข้อมูลได้</p>;
   }
 
-  const machineStatusBar = [
-    { label: "Running", value: stats.running, color: "bg-green-500" },
-    { label: "Stop", value: stats.stop, color: "bg-yellow-500" },
-    { label: "Alarm", value: stats.machineAlarm, color: "bg-red-500" },
-    { label: "Maintenance", value: stats.machineMaintenance, color: "bg-blue-500" },
-  ];
-  const machineTotal = Math.max(stats.machines, 1);
+  const machineStatusBar = buildStatusSummary([
+    { label: "Running", value: stats.running },
+    { label: "Stop", value: stats.stop },
+    { label: "Alarm", value: stats.machineAlarm },
+    { label: "Maintenance", value: stats.machineMaintenance },
+  ]).map((slice, i) => ({
+    ...slice,
+    color: ["bg-green-500", "bg-yellow-500", "bg-red-500", "bg-blue-500"][i],
+  }));
 
-  const alarmStatusBar = [
-    { label: "Open", value: stats.openAlarms, color: "bg-red-500" },
-    { label: "In Progress", value: stats.inProgressAlarms, color: "bg-yellow-500" },
-    { label: "Closed", value: stats.closedAlarms, color: "bg-green-500" },
-  ];
-  const alarmTotal = Math.max(stats.alarms, 1);
+  const alarmStatusBar = buildStatusSummary([
+    { label: "Open", value: stats.openAlarms },
+    { label: "In Progress", value: stats.inProgressAlarms },
+    { label: "Closed", value: stats.closedAlarms },
+  ]).map((slice, i) => ({
+    ...slice,
+    color: ["bg-red-500", "bg-yellow-500", "bg-green-500"][i],
+  }));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-xl shadow-sm">
-          👋
-        </span>
-        <div>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Dashboard</h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            ยินดีต้อนรับ {user.full_name ?? user.email} กลับมา
-          </p>
-        </div>
-      </div>
+    <div className="space-y-5">
+      <PageHeader
+        icon="👋"
+        title="Dashboard"
+        description={`ยินดีต้อนรับ ${user.full_name ?? user.email} กลับมา`}
+      />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatCard
@@ -139,6 +195,7 @@ export default async function DashboardPage() {
           chip="bg-zinc-100 dark:bg-zinc-800"
         />
         <StatCard
+          delay={60}
           label="เครื่องจักรแจ้ง Alarm"
           value={stats.machineAlarm}
           color="text-red-600 dark:text-red-400"
@@ -146,6 +203,7 @@ export default async function DashboardPage() {
           chip="bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
         />
         <StatCard
+          delay={120}
           label="รายการ Alarm ทั้งหมด"
           value={stats.alarms}
           color="text-orange-600 dark:text-orange-400"
@@ -153,6 +211,7 @@ export default async function DashboardPage() {
           chip="bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400"
         />
         <StatCard
+          delay={180}
           label="งานบำรุงรักษา"
           value={stats.maintenance}
           color="text-blue-600 dark:text-blue-400"
@@ -162,83 +221,58 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100 text-sm dark:bg-zinc-800">
-              📦
-            </span>
+        <Card delay={120}>
+          <CardTitle icon="📦" iconClass="bg-zinc-100 dark:bg-zinc-800">
             สถานะเครื่องจักร (Machine Status)
-          </h3>
-          <div className="space-y-4">
-            {machineStatusBar.map((s) => (
-              <div key={s.label}>
-                <div className="mb-1 flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                  <span>
-                    {s.label} ({s.value})
-                  </span>
-                  <span>{Math.round((s.value / machineTotal) * 100)}%</span>
-                </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-                  <div
-                    className={`h-full rounded-full ${s.color}`}
-                    style={{ width: `${(s.value / machineTotal) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          </CardTitle>
+          <StatusBar slices={machineStatusBar} />
+        </Card>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100 text-sm dark:bg-zinc-800">
-              ⏱️
-            </span>
+        <Card delay={180}>
+          <CardTitle icon="⏱️" iconClass="bg-zinc-100 dark:bg-zinc-800">
             สถานะ Alarm
-          </h3>
-          <div className="space-y-4">
-            {alarmStatusBar.map((s) => (
-              <div key={s.label}>
-                <div className="mb-1 flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                  <span>
-                    {s.label} ({s.value})
-                  </span>
-                  <span>{Math.round((s.value / alarmTotal) * 100)}%</span>
-                </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-                  <div
-                    className={`h-full rounded-full ${s.color}`}
-                    style={{ width: `${(s.value / alarmTotal) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          </CardTitle>
+          <StatusBar slices={alarmStatusBar} />
+        </Card>
       </div>
 
+      <Card delay={240}>
+        <CardTitle
+          icon="📈"
+          iconClass="bg-indigo-100 dark:bg-indigo-900/40"
+          action={
+            <span className="text-xs text-zinc-400">
+              รวม {trend.reduce((sum, point) => sum + point.total, 0)} รายการ
+            </span>
+          }
+        >
+          แนวโน้มจำนวน Alarm 14 วันล่าสุด
+        </CardTitle>
+        <AlarmTrendChart points={trend} />
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-100 text-sm dark:bg-red-900/40">
-                🚨
-              </span>
-              Alarm ที่ยังเปิดอยู่
-            </h3>
-            <Link
-              href="/alarms"
-              className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
-            >
-              ดูทั้งหมด →
-            </Link>
-          </div>
+        <Card delay={300}>
+          <CardTitle
+            icon="🚨"
+            iconClass="bg-red-100 dark:bg-red-900/40"
+            action={
+              <Link
+                href="/alarms"
+                className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+              >
+                ดูทั้งหมด →
+              </Link>
+            }
+          >
+            Alarm ที่ยังเปิดอยู่
+          </CardTitle>
           {recentAlarms.length === 0 ? (
-            <p className="text-sm text-zinc-400">ไม่มี Alarm ค้างอยู่ 🎉</p>
+            <EmptyState icon="🎉" title="ไม่มี Alarm ค้างอยู่" hint="ทุกเครื่องจักรทำงานปกติครับ" />
           ) : (
-            <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <ul className="scroll-slim divide-y divide-zinc-100 dark:divide-zinc-800">
               {recentAlarms.map((a) => (
-                <li key={a.id} className="flex items-center justify-between gap-2 py-2">
+                <li key={a.id} className="flex items-center justify-between gap-2 py-2.5">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
                       {a.alarm_code} · {a.machines?.machine_id}
@@ -257,29 +291,29 @@ export default async function DashboardPage() {
               ))}
             </ul>
           )}
-        </div>
+        </Card>
 
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-sm dark:bg-blue-900/40">
-                🔧
-              </span>
-              งานซ่อมที่ถึงกำหนด
-            </h3>
-            <Link
-              href="/maintenance"
-              className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
-            >
-              ดูทั้งหมด →
-            </Link>
-          </div>
+        <Card delay={340}>
+          <CardTitle
+            icon="🔧"
+            iconClass="bg-blue-100 dark:bg-blue-900/40"
+            action={
+              <Link
+                href="/maintenance"
+                className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+              >
+                ดูทั้งหมด →
+              </Link>
+            }
+          >
+            งานซ่อมที่ถึงกำหนด
+          </CardTitle>
           {upcomingMaintenance.length === 0 ? (
-            <p className="text-sm text-zinc-400">ไม่มีงานซ่อมค้างอยู่</p>
+            <EmptyState icon="🗓️" title="ไม่มีงานซ่อมค้างอยู่" hint="งานบำรุงรักษาทั้งหมดเสร็จสิ้นแล้ว" />
           ) : (
-            <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <ul className="scroll-slim divide-y divide-zinc-100 dark:divide-zinc-800">
               {upcomingMaintenance.map((r) => (
-                <li key={r.id} className="flex items-center justify-between gap-2 py-2">
+                <li key={r.id} className="flex items-center justify-between gap-2 py-2.5">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
                       {r.maintenance_date} · {r.machines?.machine_id}
@@ -293,8 +327,44 @@ export default async function DashboardPage() {
               ))}
             </ul>
           )}
-        </div>
+        </Card>
       </div>
+
+      <Card delay={380}>
+        <CardTitle
+          icon="🔔"
+          iconClass="bg-orange-100 dark:bg-orange-900/40"
+          action={
+            <span className="text-xs text-zinc-400">{alertNotifications.length} รายการ</span>
+          }
+        >
+          สิ่งที่ต้องแจ้งเตือน
+        </CardTitle>
+        {alertNotifications.length === 0 ? (
+          <EmptyState icon="🎉" title="ไม่มีรายการที่ต้องแจ้งเตือน" hint="ระบบทำงานปกติ ไม่มี Alarm ค้างหรืองานเกินกำหนด" />
+        ) : (
+          <ul className="grid gap-2 md:grid-cols-2">
+            {alertNotifications.slice(0, 6).map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={item.href}
+                  className="flex items-start gap-3 rounded-xl border border-zinc-100 p-3 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-zinc-50 hover:shadow-sm dark:border-zinc-800 dark:hover:border-blue-900 dark:hover:bg-zinc-900"
+                >
+                  <StatusBadge status={item.severity} />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">
+                      {item.title}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-zinc-500 dark:text-zinc-400">
+                      {item.detail}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
     </div>
   );
 }

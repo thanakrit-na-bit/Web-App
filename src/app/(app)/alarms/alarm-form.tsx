@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { addAlarm, updateAlarm } from "@/app/actions/alarms";
 import { ALARM_STATUSES, type Alarm, type Machine } from "@/lib/types";
+import { Modal } from "@/components/modal";
 
 const inputClass =
   "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
@@ -19,6 +20,7 @@ export function AlarmForm({
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const router = useRouter();
+  const FORM_ID = `alarm-form-${useId()}`;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,28 +47,38 @@ export function AlarmForm({
           setError("");
           setOpen(true);
         }}
-        className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+        className="rounded-lg bg-gradient-to-br from-red-600 to-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-95"
       >
         {alarm ? "แก้ไข" : "➕ บันทึก Alarm"}
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-950">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {alarm ? "แก้ไข Alarm" : "บันทึก Alarm ใหม่"}
-              </h3>
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          title={alarm ? "แก้ไข Alarm" : "บันทึก Alarm ใหม่"}
+          description="ช่องที่มีเครื่องหมาย * ต้องกรอกให้ครบ"
+          footer={
+            <>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
               >
-                ✕
+                ยกเลิก
               </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
+              <button
+                type="submit"
+                form={FORM_ID}
+                disabled={pending}
+                className="rounded-lg bg-gradient-to-br from-red-600 to-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+              >
+                {pending ? "กำลังบันทึก..." : "บันทึก"}
+              </button>
+            </>
+          }
+        >
+          <form id={FORM_ID} onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   เครื่องจักร (Machine) <span className="text-red-500">*</span>
@@ -163,26 +175,8 @@ export function AlarmForm({
                   {error}
                 </p>
               )}
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  type="submit"
-                  disabled={pending}
-                  className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60"
-                >
-                  {pending ? "กำลังบันทึก..." : "บันทึก"}
-                </button>
-              </div>
             </form>
-          </div>
-        </div>
+        </Modal>
       )}
     </>
   );

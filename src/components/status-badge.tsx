@@ -10,6 +10,7 @@ const statusColors: Record<string, string> = {
   "In Progress":
     "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300",
   Closed: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  Completed: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
   Scheduled:
     "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
   "Waiting Part":
