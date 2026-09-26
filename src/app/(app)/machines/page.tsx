@@ -7,13 +7,12 @@ import { StatusBadge } from "@/components/status-badge";
 import { ExportCsvButton } from "@/components/export-csv-button";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { Icon } from "@/components/icon";
 import { MachineForm } from "./machine-form";
 import { MachineRowActions } from "./machine-row-actions";
 
-const selectClass =
-  "rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
-const inputClass =
-  "rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
+const selectClass = "field w-auto";
+const inputClass = "field";
 
 export default async function MachinesPage(props: PageProps<"/machines">) {
   const { q, status } = await props.searchParams;
@@ -57,7 +56,7 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
   return (
     <div className="space-y-5">
       <PageHeader
-        icon="⚙️"
+        icon="machine"
         title="เครื่องจักร (Machines)"
         description="จัดการข้อมูลเครื่องจักรทั้งหมดในโรงงาน"
         actions={
@@ -68,16 +67,16 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
         }
       />
 
-      <form className="surface no-print flex flex-wrap items-center gap-2.5 p-3.5">
+      <form className="surface no-print flex flex-wrap items-center gap-2.5 p-3">
         <div className="relative min-w-56 flex-1">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400">
-            🔍
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+            <Icon name="search" className="h-4 w-4" />
           </span>
           <input
             name="q"
             defaultValue={search ?? ""}
             placeholder="ค้นหา ID / ชื่อ / ประเภท / ตำแหน่ง..."
-            className={`${inputClass} w-full pl-9`}
+            className={`${inputClass} pl-9`}
           />
         </div>
         <select name="status" defaultValue={statusFilter ?? ""} className={selectClass}>
@@ -90,14 +89,14 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
         </select>
         <button
           type="submit"
-          className="rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110 active:scale-95"
+          className="btn btn-primary"
         >
           ค้นหา
         </button>
         {search || statusFilter ? (
           <Link
             href="/machines"
-            className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="btn btn-ghost"
           >
             ล้างตัวกรอง
           </Link>
@@ -107,7 +106,7 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
       <div className="surface animate-rise overflow-hidden">
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/95 text-xs uppercase tracking-wide text-zinc-500 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-400">
+            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <tr>
                 <th className="px-4 py-3">Machine ID</th>
                 <th className="px-4 py-3">ชื่อเครื่องจักร</th>
@@ -118,12 +117,12 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
                 {isAdmin && <th className="px-4 py-3">จัดการ</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-line">
               {rows.length === 0 ? (
                 <tr>
                   <td colSpan={colCount} className="p-5">
                     <EmptyState
-                      icon="🔍"
+                      icon="search"
                       title="ไม่พบข้อมูลเครื่องจักร"
                       hint="ลองเปลี่ยนคำค้นหาหรือล้างตัวกรอง แล้วค้นหาอีกครั้ง"
                     />
@@ -133,7 +132,7 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
                 rows.map((m) => (
                   <tr
                     key={m.id}
-                    className="transition-colors hover:bg-blue-50/40 dark:hover:bg-zinc-900/60"
+                    className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70"
                   >
                     <td className="px-4 py-3 font-mono text-xs text-zinc-700 dark:text-zinc-300">{m.machine_id}</td>
                     <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{m.machine_name}</td>
@@ -145,9 +144,10 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
                     <td className="px-4 py-3">
                       <Link
                         href={`/machines/${m.id}`}
-                        className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+                        className="inline-flex items-center gap-0.5 text-sm font-medium text-accent hover:underline"
                       >
                         ดูประวัติ
+                        <Icon name="chevron-right" className="h-3.5 w-3.5" />
                       </Link>
                     </td>
                     {isAdmin && (

@@ -32,7 +32,7 @@ export default async function AdminUsersPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        icon="👥"
+        icon="users"
         title="ผู้ใช้งาน (Users)"
         description="กำหนด Role ให้กับผู้ใช้งาน (เฉพาะ Admin)"
       />
@@ -40,7 +40,7 @@ export default async function AdminUsersPage() {
       <div className="surface animate-rise overflow-hidden">
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/95 text-xs uppercase tracking-wide text-zinc-500 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-400">
+            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <tr>
                 <th className="px-4 py-3">ชื่อ</th>
                 <th className="px-4 py-3">Role</th>
@@ -48,20 +48,20 @@ export default async function AdminUsersPage() {
                 <th className="px-4 py-3">สมัครเมื่อ</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-line">
               {rows.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="p-5">
-                    <EmptyState icon="👥" title="ไม่พบผู้ใช้งาน" hint="ผู้ใช้ที่สมัครผ่านระบบจะแสดงที่นี่" />
+                    <EmptyState icon="users" title="ไม่พบผู้ใช้งาน" hint="ผู้ใช้ที่สมัครผ่านระบบจะแสดงที่นี่" />
                   </td>
                 </tr>
               ) : (
                 rows.map((p) => (
-                  <tr key={p.id} className="transition-colors hover:bg-blue-50/40 dark:hover:bg-zinc-900/60">
+                  <tr key={p.id} className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70">
                     <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
                       {p.full_name ?? "-"}
                       {p.role === "admin" && (
-                        <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">
+                        <span className="ml-2 rounded bg-purple-50 px-2 py-0.5 text-xs text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
                           Admin
                         </span>
                       )}

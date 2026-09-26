@@ -10,10 +10,8 @@ import { PageHeader } from "@/components/page-header";
 import { AlarmForm } from "./alarm-form";
 import { AlarmRowActions } from "./alarm-row-actions";
 
-const selectClass =
-  "rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
-const inputClass =
-  "rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
+const selectClass = "field w-auto";
+const inputClass = "field";
 
 function formatDateTime(value: string | null | undefined) {
   if (!value) return "-";
@@ -80,7 +78,7 @@ export default async function AlarmsPage(props: PageProps<"/alarms">) {
   return (
     <div className="space-y-5">
       <PageHeader
-        icon="🚨"
+        icon="alarm"
         title="รายการ Alarm"
         description="บันทึกและติดตามสถานะ Alarm ของเครื่องจักร"
         actions={
@@ -142,14 +140,14 @@ export default async function AlarmsPage(props: PageProps<"/alarms">) {
         </label>
         <button
           type="submit"
-          className="rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110 active:scale-95"
+          className="btn btn-primary"
         >
           ค้นหา
         </button>
         {hasFilter ? (
           <Link
             href="/alarms"
-            className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="btn btn-ghost"
           >
             ล้างตัวกรอง
           </Link>
@@ -159,7 +157,7 @@ export default async function AlarmsPage(props: PageProps<"/alarms">) {
       <div className="surface animate-rise overflow-hidden">
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/95 text-xs uppercase tracking-wide text-zinc-500 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-400">
+            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <tr>
                 <th className="px-4 py-3">Alarm Code</th>
                 <th className="px-4 py-3">เครื่องจักร</th>
@@ -170,12 +168,12 @@ export default async function AlarmsPage(props: PageProps<"/alarms">) {
                 {canEdit && <th className="px-4 py-3">จัดการ</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-line">
               {rows.length === 0 ? (
                 <tr>
                   <td colSpan={canEdit ? 7 : 6} className="p-5">
                     <EmptyState
-                      icon="🔍"
+                      icon="search"
                       title="ไม่พบรายการ Alarm"
                       hint={
                         hasFilter
@@ -189,7 +187,7 @@ export default async function AlarmsPage(props: PageProps<"/alarms">) {
                 rows.map((a) => (
                   <tr
                     key={a.id}
-                    className="align-top transition-colors hover:bg-blue-50/40 dark:hover:bg-zinc-900/60"
+                    className="align-top transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70"
                   >
                     <td className="px-4 py-3 font-mono text-xs text-zinc-700 dark:text-zinc-300">{a.alarm_code}</td>
                     <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">

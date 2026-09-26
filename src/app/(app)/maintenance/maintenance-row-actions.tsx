@@ -12,17 +12,17 @@ const statusActions: { status: MaintenanceStatus; label: string; className: stri
   {
     status: "In Progress",
     label: "In Progress",
-    className: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200",
+    className: "bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300 dark:hover:bg-amber-900/60",
   },
   {
     status: "Waiting Part",
     label: "Waiting Part",
-    className: "bg-orange-100 text-orange-700 hover:bg-orange-200",
+    className: "bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/60 dark:text-amber-300 dark:hover:bg-amber-900/60",
   },
   {
     status: "Completed",
     label: "Completed",
-    className: "bg-green-100 text-green-700 hover:bg-green-200",
+    className: "bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-950/60 dark:text-green-300 dark:hover:bg-green-900/60",
   },
 ];
 
@@ -55,7 +55,7 @@ export function MaintenanceRowActions({ recordId }: { recordId: string }) {
           type="button"
           onClick={() => run(() => updateMaintenanceStatus(recordId, a.status))}
           disabled={pending}
-          className={`rounded-full px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${a.className}`}
+          className={`rounded-md px-2.5 py-1 text-xs font-medium disabled:opacity-60 ${a.className}`}
         >
           {a.label}
         </button>
@@ -64,7 +64,7 @@ export function MaintenanceRowActions({ recordId }: { recordId: string }) {
         type="button"
         onClick={handleDelete}
         disabled={pending}
-        className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-200 disabled:opacity-60"
+        className="rounded-md bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-60 dark:bg-red-950/60 dark:text-red-300 dark:hover:bg-red-900/60"
       >
         ลบ
       </button>

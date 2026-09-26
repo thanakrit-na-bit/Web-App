@@ -7,6 +7,7 @@ import { AlarmTrendChart } from "@/components/alarm-trend-chart";
 import { Card, CardTitle } from "@/components/card";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { Icon, type IconName } from "@/components/icon";
 import { buildAlarmTrend, buildStatusSummary } from "@/lib/analytics";
 import { buildNotifications } from "@/lib/notifications";
 import type { Alarm, Maintenance } from "@/lib/types";
@@ -63,24 +64,26 @@ function StatCard({
   label: string;
   value: number;
   color: string;
-  icon: string;
+  icon: IconName;
   chip: string;
   delay?: number;
 }) {
   return (
     <div
-      className="surface animate-rise group relative overflow-hidden p-5 transition hover:-translate-y-0.5 hover:shadow-lg"
+      className="surface animate-rise p-4 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700"
       style={delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm leading-tight text-zinc-500 dark:text-zinc-400">{label}</p>
         <span
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg transition group-hover:scale-105 ${chip}`}
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${chip}`}
         >
-          {icon}
+          <Icon name={icon} className="h-4 w-4" />
         </span>
       </div>
-      <p className={`mt-3 text-3xl font-bold tabular-nums tracking-tight ${color}`}>{value}</p>
+      <p className={`mt-2.5 text-2xl font-semibold tabular-nums tracking-tight ${color}`}>
+        {value}
+      </p>
     </div>
   );
 }
@@ -96,7 +99,7 @@ function StatusBar({ slices }: { slices: { label: string; value: number; percent
             </span>
             <span className="tabular-nums text-zinc-400">{s.percent}%</span>
           </div>
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
             <div
               className={`h-full rounded-full ${s.color} transition-[width] duration-700 ease-out`}
               style={{ width: `${s.percent}%` }}
@@ -181,65 +184,60 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        icon="👋"
+        icon="dashboard"
         title="Dashboard"
         description={`ยินดีต้อนรับ ${user.full_name ?? user.email} กลับมา`}
       />
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <StatCard
           label="เครื่องจักรทั้งหมด"
           value={stats.machines}
           color="text-zinc-900 dark:text-zinc-100"
-          icon="🏭"
-          chip="bg-zinc-100 dark:bg-zinc-800"
+          icon="machine"
+          chip="bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
         />
         <StatCard
           delay={60}
           label="เครื่องจักรแจ้ง Alarm"
           value={stats.machineAlarm}
           color="text-red-600 dark:text-red-400"
-          icon="🚨"
-          chip="bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
+          icon="alarm"
+          chip="bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400"
         />
         <StatCard
           delay={120}
           label="รายการ Alarm ทั้งหมด"
           value={stats.alarms}
-          color="text-orange-600 dark:text-orange-400"
-          icon="⚠️"
-          chip="bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400"
+          color="text-amber-600 dark:text-amber-400"
+          icon="activity"
+          chip="bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400"
         />
         <StatCard
           delay={180}
           label="งานบำรุงรักษา"
           value={stats.maintenance}
-          color="text-blue-600 dark:text-blue-400"
-          icon="🔧"
-          chip="bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400"
+          color="text-accent"
+          icon="wrench"
+          chip="bg-accent-soft text-accent"
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card delay={120}>
-          <CardTitle icon="📦" iconClass="bg-zinc-100 dark:bg-zinc-800">
-            สถานะเครื่องจักร (Machine Status)
-          </CardTitle>
+          <CardTitle icon="machine">สถานะเครื่องจักร (Machine Status)</CardTitle>
           <StatusBar slices={machineStatusBar} />
         </Card>
 
         <Card delay={180}>
-          <CardTitle icon="⏱️" iconClass="bg-zinc-100 dark:bg-zinc-800">
-            สถานะ Alarm
-          </CardTitle>
+          <CardTitle icon="alarm">สถานะ Alarm</CardTitle>
           <StatusBar slices={alarmStatusBar} />
         </Card>
       </div>
 
       <Card delay={240}>
         <CardTitle
-          icon="📈"
-          iconClass="bg-indigo-100 dark:bg-indigo-900/40"
+          icon="activity"
           action={
             <span className="text-xs text-zinc-400">
               รวม {trend.reduce((sum, point) => sum + point.total, 0)} รายการ
@@ -254,25 +252,25 @@ export default async function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card delay={300}>
           <CardTitle
-            icon="🚨"
-            iconClass="bg-red-100 dark:bg-red-900/40"
+            icon="alarm"
             action={
               <Link
                 href="/alarms"
-                className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+                className="flex items-center gap-0.5 text-xs font-medium text-accent hover:underline"
               >
-                ดูทั้งหมด →
+                ดูทั้งหมด
+                <Icon name="chevron-right" className="h-3.5 w-3.5" />
               </Link>
             }
           >
             Alarm ที่ยังเปิดอยู่
           </CardTitle>
           {recentAlarms.length === 0 ? (
-            <EmptyState icon="🎉" title="ไม่มี Alarm ค้างอยู่" hint="ทุกเครื่องจักรทำงานปกติครับ" />
+            <EmptyState icon="check" title="ไม่มี Alarm ค้างอยู่" hint="ทุกเครื่องจักรทำงานปกติครับ" />
           ) : (
-            <ul className="scroll-slim divide-y divide-zinc-100 dark:divide-zinc-800">
+            <ul className="scroll-slim -mx-1 divide-y divide-line">
               {recentAlarms.map((a) => (
-                <li key={a.id} className="flex items-center justify-between gap-2 py-2.5">
+                <li key={a.id} className="flex items-center justify-between gap-2 px-1 py-2.5">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
                       {a.alarm_code} · {a.machines?.machine_id}
@@ -295,25 +293,25 @@ export default async function DashboardPage() {
 
         <Card delay={340}>
           <CardTitle
-            icon="🔧"
-            iconClass="bg-blue-100 dark:bg-blue-900/40"
+            icon="wrench"
             action={
               <Link
                 href="/maintenance"
-                className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+                className="flex items-center gap-0.5 text-xs font-medium text-accent hover:underline"
               >
-                ดูทั้งหมด →
+                ดูทั้งหมด
+                <Icon name="chevron-right" className="h-3.5 w-3.5" />
               </Link>
             }
           >
             งานซ่อมที่ถึงกำหนด
           </CardTitle>
           {upcomingMaintenance.length === 0 ? (
-            <EmptyState icon="🗓️" title="ไม่มีงานซ่อมค้างอยู่" hint="งานบำรุงรักษาทั้งหมดเสร็จสิ้นแล้ว" />
+            <EmptyState icon="check" title="ไม่มีงานซ่อมค้างอยู่" hint="งานบำรุงรักษาทั้งหมดเสร็จสิ้นแล้ว" />
           ) : (
-            <ul className="scroll-slim divide-y divide-zinc-100 dark:divide-zinc-800">
+            <ul className="scroll-slim -mx-1 divide-y divide-line">
               {upcomingMaintenance.map((r) => (
-                <li key={r.id} className="flex items-center justify-between gap-2 py-2.5">
+                <li key={r.id} className="flex items-center justify-between gap-2 px-1 py-2.5">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
                       {r.maintenance_date} · {r.machines?.machine_id}
@@ -332,8 +330,7 @@ export default async function DashboardPage() {
 
       <Card delay={380}>
         <CardTitle
-          icon="🔔"
-          iconClass="bg-orange-100 dark:bg-orange-900/40"
+          icon="bell"
           action={
             <span className="text-xs text-zinc-400">{alertNotifications.length} รายการ</span>
           }
@@ -341,14 +338,14 @@ export default async function DashboardPage() {
           สิ่งที่ต้องแจ้งเตือน
         </CardTitle>
         {alertNotifications.length === 0 ? (
-          <EmptyState icon="🎉" title="ไม่มีรายการที่ต้องแจ้งเตือน" hint="ระบบทำงานปกติ ไม่มี Alarm ค้างหรืองานเกินกำหนด" />
+          <EmptyState icon="check" title="ไม่มีรายการที่ต้องแจ้งเตือน" hint="ระบบทำงานปกติ ไม่มี Alarm ค้างหรืองานเกินกำหนด" />
         ) : (
           <ul className="grid gap-2 md:grid-cols-2">
             {alertNotifications.slice(0, 6).map((item) => (
               <li key={item.id}>
                 <Link
                   href={item.href}
-                  className="flex items-start gap-3 rounded-xl border border-zinc-100 p-3 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-zinc-50 hover:shadow-sm dark:border-zinc-800 dark:hover:border-blue-900 dark:hover:bg-zinc-900"
+                  className="flex items-start gap-3 rounded-lg border border-line p-3 transition-colors hover:border-accent/40 hover:bg-sunken"
                 >
                   <StatusBadge status={item.severity} />
                   <span className="min-w-0">

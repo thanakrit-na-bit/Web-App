@@ -3,17 +3,20 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { updatePasswordAction } from "@/app/actions/auth";
+import { Icon } from "@/components/icon";
 
-const inputClass =
-  "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-blue-400 dark:focus:ring-blue-900";
+const inputClass = "field";
 
 export function ResetPasswordForm() {
   const [state, action, pending] = useActionState(updatePasswordAction, undefined);
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="panel w-full max-w-sm p-7">
       <div className="mb-6 text-center">
-        <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+        <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-white">
+          <Icon name="key" className="h-6 w-6" />
+        </span>
+        <h1 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
           ตั้งรหัสผ่านใหม่
         </h1>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -41,12 +44,12 @@ export function ResetPasswordForm() {
         </div>
 
         {state?.error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/40 dark:text-red-300">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/60 dark:text-red-300">
             {state.error}
           </p>
         )}
         {state && !state.error && state.ok && (
-          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-900/40 dark:text-green-300">
+          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950/60 dark:text-green-300">
             เปลี่ยนรหัสผ่านสำเร็จ — เข้าสู่ระบบได้เลย
           </p>
         )}
@@ -54,18 +57,15 @@ export function ResetPasswordForm() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn btn-primary w-full py-2.5"
         >
           {pending ? "กำลังบันทึก..." : "บันทึกรหัสผ่านใหม่"}
         </button>
       </form>
 
       <div className="mt-4 text-center">
-        <Link
-          href="/login"
-          className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
-        >
-          ← กลับไปเข้าสู่ระบบ
+        <Link href="/login" className="text-sm font-medium text-accent hover:underline">
+          กลับไปเข้าสู่ระบบ
         </Link>
       </div>
     </div>

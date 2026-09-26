@@ -20,12 +20,12 @@ function formatDateTime(value: string) {
 
 function actionColor(action: string) {
   if (action === "INSERT") {
-    return "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300";
+    return "bg-green-50 text-green-700 dark:bg-green-950/60 dark:text-green-300";
   }
   if (action === "UPDATE") {
-    return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300";
+    return "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300";
   }
-  return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300";
+  return "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300";
 }
 
 export default async function AdminAuditPage() {
@@ -51,7 +51,7 @@ export default async function AdminAuditPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        icon="📜"
+        icon="audit"
         title="Audit Log"
         description="บันทึกการเพิ่ม / แก้ไข / ลบ ข้อมูลทั้งหมดในระบบ (แสดง 200 รายการล่าสุด)"
       />
@@ -59,7 +59,7 @@ export default async function AdminAuditPage() {
       <div className="surface animate-rise overflow-hidden">
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/95 text-xs uppercase tracking-wide text-zinc-500 backdrop-blur dark:border-zinc-800 dark:bg-zinc-900/95 dark:text-zinc-400">
+            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <tr>
                 <th className="px-4 py-3">Date/Time</th>
                 <th className="px-4 py-3">ผู้ใช้งาน</th>
@@ -68,12 +68,12 @@ export default async function AdminAuditPage() {
                 <th className="px-4 py-3">รายละเอียด</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <tbody className="divide-y divide-line">
               {rows.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="p-5">
                     <EmptyState
-                      icon="📜"
+                      icon="audit"
                       title="ยังไม่มีรายการ Audit Log"
                       hint="ทุกการเพิ่ม / แก้ไข / ลบ ข้อมูลจะถูกบันทึกไว้ที่นี่โดยอัตโนมัติ"
                     />
@@ -81,7 +81,7 @@ export default async function AdminAuditPage() {
                 </tr>
               ) : (
                 rows.map((log) => (
-                  <tr key={log.id} className="align-top transition-colors hover:bg-blue-50/40 dark:hover:bg-zinc-900/60">
+                  <tr key={log.id} className="align-top transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70">
                     <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
                       {formatDateTime(log.created_at)}
                     </td>
@@ -90,7 +90,7 @@ export default async function AdminAuditPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${actionColor(log.action)}`}
+                        className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${actionColor(log.action)}`}
                       >
                         {log.action}
                       </span>

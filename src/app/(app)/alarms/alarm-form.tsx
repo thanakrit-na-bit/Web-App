@@ -47,9 +47,9 @@ export function AlarmForm({
           setError("");
           setOpen(true);
         }}
-        className="rounded-lg bg-gradient-to-br from-red-600 to-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-95"
+        className="btn btn-primary"
       >
-        {alarm ? "แก้ไข" : "➕ บันทึก Alarm"}
+        {alarm ? "แก้ไข" : "บันทึก Alarm"}
       </button>
 
       {open && (
@@ -63,7 +63,7 @@ export function AlarmForm({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                className="btn btn-ghost"
               >
                 ยกเลิก
               </button>
@@ -71,7 +71,7 @@ export function AlarmForm({
                 type="submit"
                 form={FORM_ID}
                 disabled={pending}
-                className="rounded-lg bg-gradient-to-br from-red-600 to-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+                className="btn btn-primary"
               >
                 {pending ? "กำลังบันทึก..." : "บันทึก"}
               </button>
@@ -171,7 +171,7 @@ export function AlarmForm({
               </div>
 
               {error && (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/40 dark:text-red-300">
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/60 dark:text-red-300">
                   {error}
                 </p>
               )}

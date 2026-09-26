@@ -13,7 +13,7 @@ export function ResetPasswordButton({ userId }: { userId: string }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+        className="text-sm font-medium text-accent hover:underline"
       >
         {open ? "ยกเลิก" : "รีเซ็ตรหัส"}
       </button>
@@ -26,12 +26,12 @@ export function ResetPasswordButton({ userId }: { userId: string }) {
             placeholder="รหัสใหม่ (ขั้นต่ำ 6)"
             minLength={6}
             required
-            className="w-44 rounded-md border border-zinc-300 px-2 py-1 text-xs outline-none focus:border-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="field w-44 py-1 text-xs"
           />
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-blue-600 px-2 py-1 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+            className="btn btn-primary px-2 py-1 text-xs"
           >
             {pending ? "..." : "ตั้งรหัส"}
           </button>

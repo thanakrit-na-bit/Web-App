@@ -6,11 +6,11 @@ import {
   signupAction,
   requestPasswordResetAction,
 } from "@/app/actions/auth";
+import { Icon } from "@/components/icon";
 
 type Mode = "login" | "signup" | "forgot";
 
-const inputClass =
-  "w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-blue-400 dark:focus:ring-blue-900";
+const inputClass = "field";
 
 export function AuthForm() {
   const [mode, setMode] = useState<Mode>("login");
@@ -35,12 +35,12 @@ export function AuthForm() {
   const isForgot = mode === "forgot";
 
   return (
-    <div className="animate-rise w-full max-w-sm rounded-2xl border border-zinc-200/80 bg-white/90 p-8 shadow-xl shadow-blue-900/5 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 dark:shadow-black/40">
+    <div className="panel animate-rise w-full max-w-sm p-7">
       <div className="mb-6 text-center">
-        <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-2xl shadow-md shadow-blue-600/25">
-          ⚙️
+        <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-white">
+          <Icon name="machine" className="h-6 w-6" />
         </span>
-        <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
           Alarm &amp; Maintenance System
         </h1>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -51,14 +51,14 @@ export function AuthForm() {
       </div>
 
       {!isForgot && (
-        <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+        <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg border border-line bg-sunken p-1">
           <button
             type="button"
             onClick={() => setMode("login")}
-            className={`rounded-md py-2 text-sm font-medium transition ${
+            className={`rounded-md py-1.5 text-sm font-medium transition-colors ${
               mode === "login"
-                ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-900 dark:text-zinc-100"
-                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                ? "bg-surface text-zinc-900 shadow-sm dark:text-zinc-100"
+                : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
             }`}
           >
             เข้าสู่ระบบ
@@ -66,10 +66,10 @@ export function AuthForm() {
           <button
             type="button"
             onClick={() => setMode("signup")}
-            className={`rounded-md py-2 text-sm font-medium transition ${
+            className={`rounded-md py-1.5 text-sm font-medium transition-colors ${
               mode === "signup"
-                ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-900 dark:text-zinc-100"
-                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                ? "bg-surface text-zinc-900 shadow-sm dark:text-zinc-100"
+                : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
             }`}
           >
             สมัครสมาชิก
@@ -151,17 +151,17 @@ export function AuthForm() {
         ) : null}
 
         {state?.error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/40 dark:text-red-300">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/60 dark:text-red-300">
             {state.error}
           </p>
         )}
         {state && !state.error && mode === "signup" && (
-          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-900/40 dark:text-green-300">
+          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950/60 dark:text-green-300">
             ลงทะเบียนสำเร็จ — ตรวจสอบอีเมลเพื่อยืนยันบัญชีก่อนเข้าสู่ระบบ
           </p>
         )}
         {state && !state.error && mode === "forgot" && (
-          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-900/40 dark:text-green-300">
+          <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950/60 dark:text-green-300">
             ส่งลิงก์รีเซ็ตไปที่อีเมลแล้ว — ตรวจสอบกล่องจดหมาย (รวม Spam)
           </p>
         )}
@@ -169,7 +169,7 @@ export function AuthForm() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/30 transition hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn btn-primary w-full py-2.5"
         >
           {pending
             ? "กำลังดำเนินการ..."
@@ -186,7 +186,7 @@ export function AuthForm() {
           <button
             type="button"
             onClick={() => setMode("login")}
-            className="font-medium text-blue-600 hover:underline dark:text-blue-400"
+            className="font-medium text-accent hover:underline"
           >
             ← กลับไปเข้าสู่ระบบ
           </button>
@@ -194,7 +194,7 @@ export function AuthForm() {
           <button
             type="button"
             onClick={() => setMode("forgot")}
-            className="font-medium text-blue-600 hover:underline dark:text-blue-400"
+            className="font-medium text-accent hover:underline"
           >
             ลืมรหัสผ่าน?
           </button>
@@ -202,21 +202,9 @@ export function AuthForm() {
       </div>
 
       {!isForgot && (
-        <div className="mt-6 border-t border-zinc-100 pt-4 text-center dark:border-zinc-800">
-          <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
-            User แรกที่ลงทะเบียนจะได้สิทธิ์เป็น Admin โดยอัตโนมัติ
-          </p>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
-            {["Next.js", "Tailwind CSS", "Supabase", "Vercel"].map((tech) => (
-              <span
-                key={tech}
-                className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 text-[11px] font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
+        <p className="mt-6 border-t border-line pt-4 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
+          User แรกที่ลงทะเบียนจะได้สิทธิ์เป็น Admin โดยอัตโนมัติ
+        </p>
       )}
     </div>
   );

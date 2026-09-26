@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { exportCsv, type CsvFilters, type CsvKind } from "@/app/actions/export";
+import { Icon } from "@/components/icon";
 
 export function ExportCsvButton({
   kind,
   filters,
-  label = "⬇ Export CSV",
+  label = "Export CSV",
 }: {
   kind: CsvKind;
   filters: CsvFilters;
@@ -40,8 +41,9 @@ export function ExportCsvButton({
       type="button"
       onClick={handleClick}
       disabled={busy}
-      className="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-zinc-50 hover:shadow-md active:translate-y-0 disabled:pointer-events-none disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-800"
+      className="btn btn-ghost"
     >
+      <Icon name="download" className="h-4 w-4" />
       {busy ? "กำลังสร้างไฟล์..." : label}
     </button>
   );

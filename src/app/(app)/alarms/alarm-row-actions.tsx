@@ -31,7 +31,7 @@ export function AlarmRowActions({ alarmId }: { alarmId: string }) {
         type="button"
         onClick={() => run(() => updateAlarmStatus(alarmId, "In Progress"))}
         disabled={pending}
-        className="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-medium text-yellow-700 hover:bg-yellow-200 disabled:opacity-60"
+        className="rounded-md bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-60 dark:bg-amber-950/60 dark:text-amber-300 dark:hover:bg-amber-900/60"
       >
         In Progress
       </button>
@@ -39,7 +39,7 @@ export function AlarmRowActions({ alarmId }: { alarmId: string }) {
         type="button"
         onClick={() => run(() => updateAlarmStatus(alarmId, "Closed"))}
         disabled={pending}
-        className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 hover:bg-green-200 disabled:opacity-60"
+        className="rounded-md bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 hover:bg-green-100 disabled:opacity-60 dark:bg-green-950/60 dark:text-green-300 dark:hover:bg-green-900/60"
       >
         Close
       </button>
@@ -47,7 +47,7 @@ export function AlarmRowActions({ alarmId }: { alarmId: string }) {
         type="button"
         onClick={handleDelete}
         disabled={pending}
-        className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-200 disabled:opacity-60"
+        className="rounded-md bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100 disabled:opacity-60 dark:bg-red-950/60 dark:text-red-300 dark:hover:bg-red-900/60"
       >
         ลบ
       </button>

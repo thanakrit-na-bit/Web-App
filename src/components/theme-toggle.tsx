@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Icon } from "@/components/icon";
 
 function currentTheme(): "light" | "dark" {
   if (
@@ -44,9 +45,13 @@ export function ThemeToggle() {
       onClick={handleClick}
       aria-label="สลับโหมดมืด / สว่าง"
       title="สลับธีม"
-      className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-sm text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
     >
-      {theme === "dark" ? "☀️" : "🌙"}
+      {theme === "dark" ? (
+        <Icon name="sun" className="h-[18px] w-[18px]" />
+      ) : (
+        <Icon name="moon" className="h-[18px] w-[18px]" />
+      )}
     </button>
   );
 }
