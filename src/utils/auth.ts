@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { can } from "@/lib/permissions";
 import type { Role } from "@/lib/types";
 
 export type CurrentUser = {
@@ -42,12 +43,12 @@ export const requireUser = cache(async (): Promise<CurrentUser> => {
 
 export const requireAdmin = cache(async (): Promise<CurrentUser> => {
   const user = await requireUser();
-  if (user.role !== "admin") redirect("/dashboard");
+  if (!can(user.role, "manageUsers")) redirect("/dashboard");
   return user;
 });
 
 export const requireEditor = cache(async (): Promise<CurrentUser> => {
   const user = await requireUser();
-  if (user.role === "viewer") redirect("/dashboard");
+  if (!can(user.role, "editAlarms")) redirect("/dashboard");
   return user;
 });

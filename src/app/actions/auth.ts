@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
+import { isValidEmail, isValidPassword } from "@/lib/validation";
 
 export type LoginState = { error?: string; ok?: boolean } | undefined;
 
@@ -22,6 +23,9 @@ export async function loginAction(
 
   if (!email || !password) {
     return { error: "กรุณากรอกอีเมลและรหัสผ่านให้ครบ" };
+  }
+  if (!isValidEmail(email)) {
+    return { error: "รูปแบบอีเมลไม่ถูกต้อง" };
   }
 
   const supabase = await createClient();
@@ -45,7 +49,10 @@ export async function signupAction(
   if (!email || !password) {
     return { error: "กรุณากรอกอีเมลและรหัสผ่านให้ครบ" };
   }
-  if (password.length < 6) {
+  if (!isValidEmail(email)) {
+    return { error: "รูปแบบอีเมลไม่ถูกต้อง" };
+  }
+  if (!isValidPassword(password)) {
     return { error: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร" };
   }
 
@@ -81,6 +88,9 @@ export async function requestPasswordResetAction(
   if (!email) {
     return { error: "กรุณากรอกอีเมล" };
   }
+  if (!isValidEmail(email)) {
+    return { error: "รูปแบบอีเมลไม่ถูกต้อง" };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -99,7 +109,7 @@ export async function updatePasswordAction(
   formData: FormData
 ): Promise<LoginState> {
   const password = String(formData.get("password") ?? "");
-  if (password.length < 6) {
+  if (!isValidPassword(password)) {
     return { error: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร" };
   }
 
@@ -123,7 +133,7 @@ export async function changePasswordAction(
   if (!current || !password) {
     return { error: "กรุณากรอกให้ครบทั้ง 2 ช่อง" };
   }
-  if (password.length < 6) {
+  if (!isValidPassword(password)) {
     return { error: "รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร" };
   }
 

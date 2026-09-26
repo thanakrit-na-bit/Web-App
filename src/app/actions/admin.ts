@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { isValidPassword } from "@/lib/validation";
 
 export type AdminResetState = { error?: string; ok?: boolean } | undefined;
 
@@ -15,7 +16,7 @@ export async function adminResetPassword(
   if (!userId || !password) {
     return { error: "กรุณากรอกรหัสผ่านใหม่" };
   }
-  if (password.length < 6) {
+  if (!isValidPassword(password)) {
     return { error: "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร" };
   }
 

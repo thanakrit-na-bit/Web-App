@@ -5,6 +5,7 @@ import { requireEditor } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ALARM_STATUSES, type AlarmStatus } from "@/lib/types";
+import { validateAlarm } from "@/lib/validation";
 
 export type ActionResult = { error?: string } | undefined;
 
@@ -46,34 +47,19 @@ export async function addAlarm(formData: FormData): Promise<ActionResult> {
   const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
-  const machineId = String(formData.get("machine_id") ?? "").trim();
-  const alarmCode = String(formData.get("alarm_code") ?? "").trim();
-  const alarmDescription = String(formData.get("alarm_description") ?? "").trim();
-  const occurredAt = String(formData.get("occurred_at") ?? "");
-  const cause = String(formData.get("cause") ?? "").trim();
-  const status = String(formData.get("status") ?? "Open") as AlarmStatus;
-
-  if (!machineId || !alarmCode || !alarmDescription) {
-    return { error: "กรุณากรอกข้อมูลที่จำเป็นให้ครบ (เครื่องจักร, Alarm Code, รายละเอียด)" };
-  }
-  if (!ALARM_STATUSES.includes(status)) {
-    return { error: "สถานะไม่ถูกต้อง" };
-  }
+  const validated = validateAlarm(formData);
+  if (!validated.ok) return { error: validated.error };
+  const alarm = validated.data;
 
   const supabase = await createClient();
   const { error } = await supabase.from("alarms").insert({
-    machine_id: machineId,
-    alarm_code: alarmCode,
-    alarm_description: alarmDescription,
-    occurred_at: occurredAt || new Date().toISOString(),
-    cause: cause || null,
-    status,
+    ...alarm,
     created_by: user.id,
   });
 
   if (error) return { error: `เกิดข้อผิดพลาด: ${error.message}` };
 
-  await syncMachineStatuses(supabase, [machineId]);
+  await syncMachineStatuses(supabase, [alarm.machine_id]);
 
   revalidatePath("/alarms");
   revalidatePath("/machines");
@@ -87,21 +73,12 @@ export async function updateAlarm(
   const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
-  const machineId = String(formData.get("machine_id") ?? "").trim();
-  const alarmCode = String(formData.get("alarm_code") ?? "").trim();
-  const alarmDescription = String(formData.get("alarm_description") ?? "").trim();
-  const occurredAt = String(formData.get("occurred_at") ?? "");
-  const cause = String(formData.get("cause") ?? "").trim();
-  const status = String(formData.get("status") ?? "Open") as AlarmStatus;
-
-  if (!machineId || !alarmCode || !alarmDescription) {
-    return { error: "กรุณากรอกข้อมูลที่จำเป็นให้ครบ" };
-  }
-  if (!ALARM_STATUSES.includes(status)) {
-    return { error: "สถานะไม่ถูกต้อง" };
-  }
+  const validated = validateAlarm(formData);
+  if (!validated.ok) return { error: validated.error };
+  const alarm = validated.data;
 
   const supabase = await createClient();
+
   const { data: prev } = await supabase
     .from("alarms")
     .select("machine_id")
@@ -110,21 +87,14 @@ export async function updateAlarm(
 
   const { error } = await supabase
     .from("alarms")
-    .update({
-      machine_id: machineId,
-      alarm_code: alarmCode,
-      alarm_description: alarmDescription,
-      occurred_at: occurredAt || new Date().toISOString(),
-      cause: cause || null,
-      status,
-    })
+    .update(alarm)
     .eq("id", id);
 
   if (error) return { error: `เกิดข้อผิดพลาด: ${error.message}` };
 
   await syncMachineStatuses(
     supabase,
-    Array.from(new Set([prev?.machine_id, machineId].filter(Boolean)))
+    Array.from(new Set([prev?.machine_id, alarm.machine_id].filter(Boolean)))
   );
 
   revalidatePath("/alarms");

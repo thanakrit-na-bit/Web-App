@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
-import { MACHINE_STATUSES, type MachineStatus } from "@/lib/types";
+import { validateMachine } from "@/lib/validation";
 
 export type ActionResult = { error?: string } | undefined;
 
@@ -13,38 +13,23 @@ export async function addMachine(
   const user = await requireAdmin();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
-  const machineId = String(formData.get("machine_id") ?? "").trim();
-  const machineName = String(formData.get("machine_name") ?? "").trim();
-  const machineType = String(formData.get("machine_type") ?? "").trim();
-  const location = String(formData.get("location") ?? "").trim();
-  const status = String(formData.get("status") ?? "Running") as MachineStatus;
-
-  if (!machineId || !machineName || !machineType || !location) {
-    return { error: "กรุณากรอกข้อมูลให้ครบทุกช่อง" };
-  }
-  if (!MACHINE_STATUSES.includes(status)) {
-    return { error: "สถานะไม่ถูกต้อง" };
-  }
+  const validated = validateMachine(formData);
+  if (!validated.ok) return { error: validated.error };
+  const machine = validated.data;
 
   const supabase = await createClient();
 
   const { data: existing } = await supabase
     .from("machines")
     .select("id")
-    .eq("machine_id", machineId)
+    .eq("machine_id", machine.machine_id)
     .maybeSingle();
 
   if (existing) {
     return { error: "Machine ID นี้มีอยู่แล้ว กรุณาใช้ ID อื่น" };
   }
 
-  const { error } = await supabase.from("machines").insert({
-    machine_id: machineId,
-    machine_name: machineName,
-    machine_type: machineType,
-    location,
-    status,
-  });
+  const { error } = await supabase.from("machines").insert(machine);
 
   if (error) {
     if (error.code === "23505") {
@@ -64,25 +49,16 @@ export async function updateMachine(
   const user = await requireAdmin();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
-  const machineId = String(formData.get("machine_id") ?? "").trim();
-  const machineName = String(formData.get("machine_name") ?? "").trim();
-  const machineType = String(formData.get("machine_type") ?? "").trim();
-  const location = String(formData.get("location") ?? "").trim();
-  const status = String(formData.get("status") ?? "Running") as MachineStatus;
-
-  if (!machineId || !machineName || !machineType || !location) {
-    return { error: "กรุณากรอกข้อมูลให้ครบทุกช่อง" };
-  }
-  if (!MACHINE_STATUSES.includes(status)) {
-    return { error: "สถานะไม่ถูกต้อง" };
-  }
+  const validated = validateMachine(formData);
+  if (!validated.ok) return { error: validated.error };
+  const machine = validated.data;
 
   const supabase = await createClient();
 
   const { data: existing } = await supabase
     .from("machines")
     .select("id")
-    .eq("machine_id", machineId)
+    .eq("machine_id", machine.machine_id)
     .neq("id", id)
     .maybeSingle();
 
@@ -92,13 +68,7 @@ export async function updateMachine(
 
   const { error } = await supabase
     .from("machines")
-    .update({
-      machine_id: machineId,
-      machine_name: machineName,
-      machine_type: machineType,
-      location,
-      status,
-    })
+    .update(machine)
     .eq("id", id);
 
   if (error) {

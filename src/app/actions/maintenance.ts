@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireEditor } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 import { MAINTENANCE_STATUSES, type MaintenanceStatus } from "@/lib/types";
+import { validateMaintenance } from "@/lib/validation";
 
 export type ActionResult = { error?: string } | undefined;
 
@@ -13,31 +14,12 @@ export async function addMaintenance(
   const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
-  const machineId = String(formData.get("machine_id") ?? "").trim();
-  const maintenanceType = String(formData.get("maintenance_type") ?? "").trim();
-  const problem = String(formData.get("problem") ?? "").trim();
-  const actionTaken = String(formData.get("action_taken") ?? "").trim();
-  const technician = String(formData.get("technician") ?? "").trim();
-  const maintenanceDate = String(formData.get("maintenance_date") ?? "");
-  const status = String(formData.get("status") ?? "Scheduled") as MaintenanceStatus;
-
-  if (!machineId || !maintenanceType || !problem || !actionTaken) {
-    return { error: "กรุณากรอกข้อมูลที่จำเป็นให้ครบ (เครื่องจักร, ประเภทงานซ่อม, ปัญหา, การแก้ไข)" };
-  }
-  if (!MAINTENANCE_STATUSES.includes(status)) {
-    return { error: "สถานะไม่ถูกต้อง" };
-  }
+  const validated = validateMaintenance(formData);
+  if (!validated.ok) return { error: validated.error };
+  const record = validated.data;
 
   const supabase = await createClient();
-  const { error } = await supabase.from("maintenance_records").insert({
-    machine_id: machineId,
-    maintenance_type: maintenanceType,
-    problem,
-    action_taken: actionTaken,
-    technician: technician || null,
-    maintenance_date: maintenanceDate || new Date().toISOString().slice(0, 10),
-    status,
-  });
+  const { error } = await supabase.from("maintenance_records").insert(record);
 
   if (error) return { error: `เกิดข้อผิดพลาด: ${error.message}` };
 
@@ -52,33 +34,13 @@ export async function updateMaintenance(
   const user = await requireEditor();
   if (!user) return { error: "ไม่ได้รับอนุญาต" };
 
-  const machineId = String(formData.get("machine_id") ?? "").trim();
-  const maintenanceType = String(formData.get("maintenance_type") ?? "").trim();
-  const problem = String(formData.get("problem") ?? "").trim();
-  const actionTaken = String(formData.get("action_taken") ?? "").trim();
-  const technician = String(formData.get("technician") ?? "").trim();
-  const maintenanceDate = String(formData.get("maintenance_date") ?? "");
-  const status = String(formData.get("status") ?? "Scheduled") as MaintenanceStatus;
-
-  if (!machineId || !maintenanceType || !problem || !actionTaken) {
-    return { error: "กรุณากรอกข้อมูลที่จำเป็นให้ครบ" };
-  }
-  if (!MAINTENANCE_STATUSES.includes(status)) {
-    return { error: "สถานะไม่ถูกต้อง" };
-  }
+  const validated = validateMaintenance(formData);
+  if (!validated.ok) return { error: validated.error };
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("maintenance_records")
-    .update({
-      machine_id: machineId,
-      maintenance_type: maintenanceType,
-      problem,
-      action_taken: actionTaken,
-      technician: technician || null,
-      maintenance_date: maintenanceDate || new Date().toISOString().slice(0, 10),
-      status,
-    })
+    .update(validated.data)
     .eq("id", id);
 
   if (error) return { error: `เกิดข้อผิดพลาด: ${error.message}` };
