@@ -29,7 +29,7 @@ export function MachineRowActions({ machineId }: { machineId: string }) {
         type="button"
         onClick={handleDelete}
         disabled={pending}
-        className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+        className="rounded-lg border border-red-500/25 px-3 py-1.5 text-xs font-medium text-red-500 transition-colors hover:border-red-500/50 hover:bg-red-500/10 disabled:opacity-60 dark:text-red-400"
       >
         ลบ
       </button>

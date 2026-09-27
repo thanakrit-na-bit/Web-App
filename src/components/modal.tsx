@@ -40,7 +40,7 @@ export function Modal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-zinc-900/50 p-4 backdrop-blur-[2px] sm:items-center">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-scrim p-4 backdrop-blur-[3px] sm:items-center">
       <button
         type="button"
         aria-label="ปิดหน้าต่าง"
@@ -68,7 +68,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="ปิด"
-            className="shrink-0 rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            className="icon-btn h-8 w-8 shrink-0 border-transparent bg-transparent"
           >
             <Icon name="close" className="h-4 w-4" />
           </button>

@@ -3,11 +3,12 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { requireUser } from "@/utils/auth";
 import { StatusBadge } from "@/components/status-badge";
-import { AlarmTrendChart } from "@/components/alarm-trend-chart";
+import { AlarmTrendPanel } from "@/components/alarm-trend-panel";
+import { StatCard } from "@/components/stat-card";
 import { Card, CardTitle } from "@/components/card";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
-import { Icon, type IconName } from "@/components/icon";
+import { Icon } from "@/components/icon";
 import { buildAlarmTrend, buildStatusSummary } from "@/lib/analytics";
 import { buildNotifications } from "@/lib/notifications";
 import type { Alarm, Maintenance } from "@/lib/types";
@@ -53,56 +54,31 @@ const getStats = cache(async () => {
   };
 });
 
-function StatCard({
-  label,
-  value,
-  color,
-  icon,
-  chip,
-  delay = 0,
+function StatusBar({
+  slices,
 }: {
-  label: string;
-  value: number;
-  color: string;
-  icon: IconName;
-  chip: string;
-  delay?: number;
+  slices: { label: string; value: number; percent: number; color: string; glow: string }[];
 }) {
   return (
-    <div
-      className="surface animate-rise p-4 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700"
-      style={delay ? { animationDelay: `${delay}ms` } : undefined}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-sm leading-tight text-zinc-500 dark:text-zinc-400">{label}</p>
-        <span
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${chip}`}
-        >
-          <Icon name={icon} className="h-4 w-4" />
-        </span>
-      </div>
-      <p className={`mt-2.5 text-2xl font-semibold tabular-nums tracking-tight ${color}`}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function StatusBar({ slices }: { slices: { label: string; value: number; percent: number; color: string }[] }) {
-  return (
-    <div className="space-y-3.5">
+    <div className="space-y-4">
       {slices.map((s) => (
-        <div key={s.label}>
-          <div className="mb-1.5 flex items-center justify-between text-xs">
+        <div key={s.label} className="group">
+          <div className="mb-2 flex items-baseline justify-between gap-3 text-xs">
             <span className="font-medium text-zinc-600 dark:text-zinc-300">
-              {s.label} <span className="tabular-nums text-zinc-400">({s.value})</span>
+              {s.label}{" "}
+              <span className="tabular-nums text-zinc-400">({s.value})</span>
             </span>
-            <span className="tabular-nums text-zinc-400">{s.percent}%</span>
+            <span className="tabular-nums text-zinc-400 transition-colors group-hover:text-zinc-600 dark:group-hover:text-zinc-300">
+              {s.percent}%
+            </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
             <div
               className={`h-full rounded-full ${s.color} transition-[width] duration-700 ease-out`}
-              style={{ width: `${s.percent}%` }}
+              style={{
+                width: `${Math.max(s.percent, s.value > 0 ? 4 : 0)}%`,
+                boxShadow: `0 0 14px -3px ${s.glow}`,
+              }}
             />
           </div>
         </div>
@@ -169,7 +145,8 @@ export default async function DashboardPage() {
     { label: "Maintenance", value: stats.machineMaintenance },
   ]).map((slice, i) => ({
     ...slice,
-    color: ["bg-green-500", "bg-yellow-500", "bg-red-500", "bg-blue-500"][i],
+    color: ["bg-green-500", "bg-zinc-400", "bg-red-500", "bg-accent"][i],
+    glow: ["rgb(34 197 94 / 0.55)", "rgb(148 156 165 / 0.4)", "rgb(239 68 68 / 0.55)", "var(--accent)"][i],
   }));
 
   const alarmStatusBar = buildStatusSummary([
@@ -179,6 +156,7 @@ export default async function DashboardPage() {
   ]).map((slice, i) => ({
     ...slice,
     color: ["bg-red-500", "bg-yellow-500", "bg-green-500"][i],
+    glow: ["rgb(239 68 68 / 0.55)", "rgb(234 179 8 / 0.55)", "rgb(34 197 94 / 0.55)"][i],
   }));
 
   return (
@@ -196,6 +174,7 @@ export default async function DashboardPage() {
           color="text-zinc-900 dark:text-zinc-100"
           icon="machine"
           chip="bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+          footnote={`ทำงาน ${stats.running} · หยุด ${stats.stop} · ซ่อม ${stats.machineMaintenance}`}
         />
         <StatCard
           delay={60}
@@ -204,6 +183,7 @@ export default async function DashboardPage() {
           color="text-red-600 dark:text-red-400"
           icon="alarm"
           chip="bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400"
+          footnote="เครื่องจักรที่ยังแจ้งเตือนอยู่"
         />
         <StatCard
           delay={120}
@@ -212,6 +192,9 @@ export default async function DashboardPage() {
           color="text-amber-600 dark:text-amber-400"
           icon="activity"
           chip="bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400"
+          spark={trend.map((p) => p.total)}
+          sparkTint="var(--accent)"
+          footnote={`14 วันล่าสุด · ${trend.reduce((sum, p) => sum + p.total, 0)} รายการ`}
         />
         <StatCard
           delay={180}
@@ -220,6 +203,7 @@ export default async function DashboardPage() {
           color="text-accent"
           icon="wrench"
           chip="bg-accent-soft text-accent"
+          footnote={`เปิดค้าง ${stats.openAlarms} alarm · กำลังซ่อม ${stats.inProgressAlarms}`}
         />
       </div>
 
@@ -235,19 +219,7 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <Card delay={240}>
-        <CardTitle
-          icon="activity"
-          action={
-            <span className="text-xs text-zinc-400">
-              รวม {trend.reduce((sum, point) => sum + point.total, 0)} รายการ
-            </span>
-          }
-        >
-          แนวโน้มจำนวน Alarm 14 วันล่าสุด
-        </CardTitle>
-        <AlarmTrendChart points={trend} />
-      </Card>
+      <AlarmTrendPanel initial={trend} />
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card delay={300}>

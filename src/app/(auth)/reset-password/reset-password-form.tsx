@@ -13,7 +13,7 @@ export function ResetPasswordForm() {
   return (
     <div className="panel w-full max-w-sm p-7">
       <div className="mb-6 text-center">
-        <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-white">
+        <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-ink shadow-[0_6px_20px_-8px_var(--accent-ring)]">
           <Icon name="key" className="h-6 w-6" />
         </span>
         <h1 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">

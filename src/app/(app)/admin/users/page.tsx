@@ -40,7 +40,7 @@ export default async function AdminUsersPage() {
       <div className="surface animate-rise overflow-hidden">
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <thead className="table-head">
               <tr>
                 <th className="px-4 py-3">ชื่อ</th>
                 <th className="px-4 py-3">Role</th>
@@ -57,11 +57,11 @@ export default async function AdminUsersPage() {
                 </tr>
               ) : (
                 rows.map((p) => (
-                  <tr key={p.id} className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70">
+                  <tr key={p.id} className="table-row">
                     <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
                       {p.full_name ?? "-"}
                       {p.role === "admin" && (
-                        <span className="ml-2 rounded bg-purple-50 px-2 py-0.5 text-xs text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
+                        <span className="ml-2 rounded bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent">
                           Admin
                         </span>
                       )}

@@ -10,7 +10,7 @@ const STORAGE_KEY = "read-notifications";
 const severityStyles: Record<AppNotification["severity"], string> = {
   critical: "bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-300",
   warning: "bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-300",
-  info: "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-300",
+  info: "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
 };
 
 const severityIcon: Record<AppNotification["severity"], IconName> = {
@@ -85,7 +85,7 @@ export function NotificationBell({
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-label={`การแจ้งเตือน (ยังไม่อ่าน ${unread.length})`}
-        className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-line text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+        className="icon-btn relative"
       >
         <Icon name="bell" className="h-[18px] w-[18px]" />
         {unread.length > 0 && (
@@ -134,8 +134,8 @@ export function NotificationBell({
                           if (isUnread) persist([...readIds, item.id]);
                           setOpen(false);
                         }}
-                        className={`flex gap-3 px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900 ${
-                          isUnread ? "bg-blue-50/60 dark:bg-blue-950/20" : ""
+                        className={`flex gap-3 px-4 py-3 transition-colors hover:bg-sunken ${
+                          isUnread ? "bg-accent-soft/70" : ""
                         }`}
                       >
                         <span

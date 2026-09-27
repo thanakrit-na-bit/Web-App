@@ -23,7 +23,7 @@ export function StatusBadge({ status }: { status: string }) {
   );
   return (
     <span
-      className={`inline-block whitespace-nowrap rounded px-2 py-0.5 text-xs font-medium ${color}`}
+      className={`inline-block whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ring-black/5 dark:ring-white/10 ${color}`}
     >
       {status}
     </span>

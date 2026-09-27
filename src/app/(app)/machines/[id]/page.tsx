@@ -105,7 +105,7 @@ export default async function MachineHistoryPage({
         </div>
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <thead className="table-head">
               <tr>
                 <th className="px-4 py-3">Alarm Code</th>
                 <th className="px-4 py-3">รายละเอียด</th>
@@ -127,7 +127,7 @@ export default async function MachineHistoryPage({
                 </tr>
               ) : (
                 alarms.map((a) => (
-                  <tr key={a.id} className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70">
+                  <tr key={a.id} className="table-row">
                     <td className="px-4 py-3 font-mono text-xs text-zinc-700 dark:text-zinc-300">{a.alarm_code}</td>
                     <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{a.alarm_description}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
@@ -151,7 +151,7 @@ export default async function MachineHistoryPage({
         </div>
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <thead className="table-head">
               <tr>
                 <th className="px-4 py-3">วันที่</th>
                 <th className="px-4 py-3">ประเภท</th>
@@ -173,7 +173,7 @@ export default async function MachineHistoryPage({
                 </tr>
               ) : (
                 maintenance.map((r) => (
-                  <tr key={r.id} className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70">
+                  <tr key={r.id} className="table-row">
                     <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
                       {r.maintenance_date}
                     </td>

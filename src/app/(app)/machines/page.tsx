@@ -67,7 +67,7 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
         }
       />
 
-      <form className="surface no-print flex flex-wrap items-center gap-2.5 p-3">
+      <form className="surface no-print filter-bar items-center p-3">
         <div className="relative min-w-56 flex-1">
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
             <Icon name="search" className="h-4 w-4" />
@@ -106,7 +106,7 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
       <div className="surface animate-rise overflow-hidden">
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <thead className="table-head">
               <tr>
                 <th className="px-4 py-3">Machine ID</th>
                 <th className="px-4 py-3">ชื่อเครื่องจักร</th>
@@ -132,7 +132,7 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
                 rows.map((m) => (
                   <tr
                     key={m.id}
-                    className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70"
+                    className="table-row"
                   >
                     <td className="px-4 py-3 font-mono text-xs text-zinc-700 dark:text-zinc-300">{m.machine_id}</td>
                     <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{m.machine_name}</td>
@@ -165,7 +165,7 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
           </table>
         </div>
         {rows.length > 0 ? (
-          <p className="border-t border-zinc-100 px-4 py-2.5 text-xs text-zinc-400 dark:border-zinc-800">
+          <p className="table-foot">
             แสดง {rows.length} เครื่องจักร
           </p>
         ) : null}

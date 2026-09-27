@@ -59,7 +59,7 @@ export default async function AdminAuditPage() {
       <div className="surface animate-rise overflow-hidden">
         <div className="scroll-slim overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 border-b border-line bg-sunken text-xs uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            <thead className="table-head">
               <tr>
                 <th className="px-4 py-3">Date/Time</th>
                 <th className="px-4 py-3">ผู้ใช้งาน</th>
@@ -81,7 +81,7 @@ export default async function AdminAuditPage() {
                 </tr>
               ) : (
                 rows.map((log) => (
-                  <tr key={log.id} className="align-top transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/70">
+                  <tr key={log.id} className="table-row align-top">
                     <td className="px-4 py-3 whitespace-nowrap text-xs text-zinc-500 dark:text-zinc-400">
                       {formatDateTime(log.created_at)}
                     </td>

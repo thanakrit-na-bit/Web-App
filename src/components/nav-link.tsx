@@ -23,12 +23,12 @@ export function NavLink({
       className={`group relative flex items-center gap-2.5 rounded-lg py-2 pl-3 pr-2.5 text-sm font-medium transition-colors ${
         active
           ? "bg-accent-soft text-accent"
-          : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+          : "text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/70 dark:hover:text-zinc-100"
       }`}
     >
       <span
         aria-hidden
-        className={`absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full bg-accent transition-opacity ${
+        className={`absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-accent transition-opacity ${
           active ? "opacity-100" : "opacity-0"
         }`}
       />

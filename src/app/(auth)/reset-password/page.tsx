@@ -53,7 +53,7 @@ export default function ResetPasswordPage() {
   }, []);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+    <main className="flex min-h-screen items-center justify-center px-4 py-10">
       <div className="fixed right-4 top-4 z-10">
         <ThemeToggle />
       </div>

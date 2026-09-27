@@ -14,7 +14,7 @@ function currentTheme(): "light" | "dark" {
 }
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
@@ -45,7 +45,7 @@ export function ThemeToggle() {
       onClick={handleClick}
       aria-label="สลับโหมดมืด / สว่าง"
       title="สลับธีม"
-      className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+      className="icon-btn"
     >
       {theme === "dark" ? (
         <Icon name="sun" className="h-[18px] w-[18px]" />
