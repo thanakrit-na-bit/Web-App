@@ -202,7 +202,9 @@ export function AuthForm() {
         )}
         {state && !state.error && mode === "signup" && (
           <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950/60 dark:text-green-300">
-            ลงทะเบียนสำเร็จ — ตรวจสอบอีเมลเพื่อยืนยันบัญชีก่อนเข้าสู่ระบบ
+            ลงทะเบียนสำเร็จ — เข้าสู่ระบบด้วยอีเมลและรหัสผ่านนี้ได้เลย
+            ไม่ต้องยืนยันผ่านอีเมล (ระบบนี้ไม่ใช้อีเมล) และบัญชีแรกที่สมัครจะได้สิทธิ์
+            Admin อัตโนมัติ
           </p>
         )}
         {state && !state.error && mode === "forgot" && (
