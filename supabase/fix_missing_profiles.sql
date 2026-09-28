@@ -60,15 +60,37 @@ where not exists (select 1 from public.profiles p where p.id = u.id)
 on conflict (id) do nothing;
 
 -- ------------------------------------------------------------
+-- 2b) ซ่อม: ถ้าไม่มี admin เลยสักคน ให้บัญชีเก่าสุดที่ยัง login ได้เป็น admin
+--     (กรณีนี้เกิดได้ถ้าบัญชี admin เดิมถูกลบ หรือถูกตั้ง role ผิด)
+-- ------------------------------------------------------------
+update public.profiles p
+set role = 'admin'
+where not exists (select 1 from public.profiles x where x.role = 'admin')
+  and p.id = (
+    select u.id from auth.users u
+    where exists (select 1 from public.profiles pr where pr.id = u.id)
+    order by u.created_at asc
+    limit 1
+  );
+
+-- ------------------------------------------------------------
 -- 3) ยืนยันผลหลังซ่อม
 -- ------------------------------------------------------------
 select
   u.email,
   coalesce(p.full_name, '(ไม่มีชื่อ)') as "ชื่อ",
   coalesce(p.role::text, '(ไม่มี profile)') as role,
+  case when p.id is null then '❌ เข้าใช้ไม่ได้' else '✅' end as "สถานะ",
   u.created_at as "สมัครเมื่อ"
 from auth.users u
 left join public.profiles p on p.id = u.id
+order by u.created_at asc;
+
+-- สรุป: ตอนนี้มี admin กี่คน (ควรได้ 1 ขึ้นไป)
+select coalesce(p.full_name, u.email) as "Admin", u.email
+from public.profiles p
+join auth.users u on u.id = p.id
+where p.role = 'admin'
 order by u.created_at asc;
 
 -- ============================================================
