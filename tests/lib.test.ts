@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildCsv } from "@/lib/csv";
 import { pick } from "@/lib/pick";
 import { can, PERMISSIONS } from "@/lib/permissions";
+import { hashResetCode } from "@/lib/reset-code";
 import {
   ALARM_STATUSES,
   MACHINE_STATUSES,
@@ -101,5 +102,25 @@ describe("ค่าคงที่สถานะตรงกับฐานข�
 
   it("มี 3 role ตามที่กำหนด", () => {
     expect(ROLES).toEqual(["admin", "technician", "viewer"]);
+  });
+});
+
+describe("hashResetCode", () => {
+  it("โค้ดเดิมได้ hash เดิมเสมอ", () => {
+    expect(hashResetCode("483920")).toBe(hashResetCode("483920"));
+  });
+
+  it("ตัดช่องว่างก่อน hash ให้ผู้ใช้พิมพ์สะดวด", () => {
+    expect(hashResetCode("  483920  ")).toBe(hashResetCode("483920"));
+  });
+
+  it("โค้ดต่างกันได้ hash ต่างกัน", () => {
+    expect(hashResetCode("483920")).not.toBe(hashResetCode("483921"));
+  });
+
+  it("hash เป็น hex 64 ตัว (SHA-256) และไม่มีโค้ดจริงหลงเหลือ", () => {
+    const hash = hashResetCode("483920");
+    expect(hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(hash).not.toContain("483920");
   });
 });

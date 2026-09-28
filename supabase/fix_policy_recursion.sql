@@ -15,6 +15,10 @@ as $$
   select role::text from public.profiles where id = auth.uid()
 $$;
 
+-- ปิดไม่ให้ anonymous เรียก RPC นี้ได้ แต่ authenticated ยังเรียกได้ (policy ต้องใช้)
+revoke execute on function public.current_user_role() from public, anon;
+grant execute on function public.current_user_role() to authenticated;
+
 -- ---------- PROFILES ----------
 drop policy if exists "profiles_select_all_admin" on public.profiles;
 create policy "profiles_select_all_admin" on public.profiles
@@ -43,6 +47,13 @@ create policy "machines_delete_admin" on public.machines
   using (public.current_user_role() = 'admin');
 
 -- ---------- ALARMS (editor = admin/technician) ----------
+-- ต้องลบ policy แบบ "authenticated" ตัวเก่า (with check (true)) ด้วยเสมอ
+-- เพราะ Postgres รวม policy แบบ permissive ด้วย OR ถ้ายังตกหล่น
+-- viewer จะกลายเป็นผู้เขียนข้อมูลได้ทันที
+drop policy if exists "alarms_insert_authenticated" on public.alarms;
+drop policy if exists "alarms_update_authenticated" on public.alarms;
+drop policy if exists "alarms_delete_authenticated" on public.alarms;
+
 drop policy if exists "alarms_insert_editor" on public.alarms;
 create policy "alarms_insert_editor" on public.alarms
   for insert to authenticated
@@ -59,6 +70,10 @@ create policy "alarms_delete_editor" on public.alarms
   using (public.current_user_role() in ('admin', 'technician'));
 
 -- ---------- MAINTENANCE (editor = admin/technician) ----------
+drop policy if exists "maintenance_insert_authenticated" on public.maintenance_records;
+drop policy if exists "maintenance_update_authenticated" on public.maintenance_records;
+drop policy if exists "maintenance_delete_authenticated" on public.maintenance_records;
+
 drop policy if exists "maintenance_insert_editor" on public.maintenance_records;
 create policy "maintenance_insert_editor" on public.maintenance_records
   for insert to authenticated

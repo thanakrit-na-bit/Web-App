@@ -33,7 +33,7 @@ begin
   if v_open_count > 0 then
     update public.machines
        set status = 'Alarm'
-     where id = v_machine_id and status <> 'Alarm';
+     where id = v_machine_id and status = 'Running';
   else
     update public.machines
        set status = 'Running'
@@ -50,9 +50,10 @@ create trigger sync_machine_status
   for each row execute function public.sync_machine_status_on_alarm();
 
 -- ---------- ปรับสถานะเครื่องตามข้อมูลเดิมที่มีอยู่แล้ว ----------
+-- เฉพาะเครื่องที่ยัง 'Running' เท่านั้น Stop/Maintenance ไม่ถูกแตะ
 update public.machines m
    set status = 'Alarm'
- where m.status <> 'Alarm'
+ where m.status = 'Running'
    and exists (
      select 1 from public.alarms a
       where a.machine_id = m.id and a.status <> 'Closed'

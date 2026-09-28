@@ -32,8 +32,9 @@ yarn-error.log*
 dev.log
 dev.err
 
-# env files (can opt-in for committing if needed)
+# env files (เก็บไว้ แต่ .env.example ต้องขึ้น repo เพื่อให้คนอื่น copy ได้)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -42,5 +43,3 @@ dev.err
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
-.env*

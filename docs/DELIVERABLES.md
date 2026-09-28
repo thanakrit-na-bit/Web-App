@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | 1 | GitHub Repository URL | ✅ | https://github.com/thanakrit-na-bit/Web-App |
 | 2 | Vercel Deployment URL | ✅ | https://alarm-maint-app.vercel.app |
-| 3 | Supabase Database Schema | ✅ | `supabase/schema.sql`, `supabase/migration_bonus.sql`, `supabase/sync_machine_status.sql`, `supabase/fix_policy_recursion.sql` + สรุปใน README |
+| 3 | Supabase Database Schema | ✅ | `supabase/schema.sql`, `supabase/migration_bonus.sql`, `supabase/sync_machine_status.sql`, `supabase/fix_policy_recursion.sql`, `supabase/reset_codes.sql` + สรุปใน README |
 | 4 | README | ✅ | `README.md` (เทคโนโลยี, ฟีเจอร์, โครงสร้าง, Database Structure, วิธีติดตั้ง, การทดสอบ, การใช้ AI) |
 | 5 | Screenshot หน้าจอระบบ | ⚠️ ต้องถ่ายเอง | ดูคำสั่งด้านล่าง → บันทึกในโฟลเดอร์นี้ |
 | 6 | รายงานการใช้ AI | ✅ | `docs/AI_USAGE_REPORT.md` (สรุปย่อใน README หัวข้อ "การใช้งาน AI ในการพัฒนา") |
@@ -23,10 +23,11 @@
 | `04-machine-history.png` | หน้า Machine History |
 | `05-alarms.png` | หน้า Alarm (พร้อมฟอร์มเพิ่มข้อมูล + ตัวกรอง) |
 | `06-maintenance.png` | หน้างานบำรุงรักษา (สถานะ Waiting Part) |
-| `07-admin-users.png` | หน้าผู้ใช้งาน (Admin) |
+| `07-admin-users.png` | หน้าผู้ใช้งาน (Admin) พร้อมปุ่ม "ออกโค้ดรีเซ็ต" |
 | `08-audit-log.png` | หน้า Audit Log |
 | `09-dark-mode.png` | หน้าใดก็ได้ในโหมดมืด |
 | `10-mobile.png` | หน้าใดก็ได้บนมือถือ (เมนู Drawer) |
+| `11-forgot-password.png` | หน้า Login ตอนกด "ลืมรหัสผ่าน?" (กรอกอีเมล + รหัสรีเซ็ต + รหัสผ่านใหม่ ไม่ต้องส่งอีเมล) |
 
 > หมายเหตุ: ถ้าต้องการภาพตัวอย่างจำนวนมาก ให้เตรียมข้อมูลตัวอย่างด้วยตัวอย่างใน
 > `supabase/schema.sql` (ท้ายไฟล์) แล้วถ่ายซ้ำเพื่อให้ Dashboard และกราฟแสดงข้อมูลครบถ้วน

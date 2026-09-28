@@ -17,6 +17,15 @@ export const MAX_LENGTHS = {
   longText: 2000,
 } as const;
 
+/** ความยาวโค้ดรีเซ็ตรหัสผ่าน (ตัวเลข 6 หลัก) */
+export const RESET_CODE_LENGTH = 6;
+
+/** อายุโค้ดรีเซ็ต (นาที) — ต้องตรงกับ expires_at ที่ออกโค้ดใน action */
+export const RESET_CODE_TTL_MINUTES = 15;
+
+/** จำนวนครั้งที่กรอกโค้ดผิดได้ก่อนโค้ดนั้นจะถูกเผา */
+export const RESET_CODE_MAX_ATTEMPTS = 5;
+
 function field(formData: FormData, key: string): string {
   return String(formData.get(key) ?? "").trim();
 }
@@ -196,4 +205,42 @@ export function isValidEmail(value: string): boolean {
 
 export function isValidPassword(value: string): boolean {
   return value.length >= 6;
+}
+
+/** โค้ดรีเซ็ตต้องเป็นตัวเลข 6 หลักเท่านั้น */
+export function isValidResetCode(value: string): boolean {
+  return new RegExp(`^\\d{${RESET_CODE_LENGTH}}$`).test(value.trim());
+}
+
+/**
+ * เทียบสตริงแบบใช้เวลาคงที่ (constant-time) เพื่อไม่ให้เวลาตอบสนองบอกว่า
+ * โค้ดถูกที่อักขระตำแหน่งใด แม้การเดาโค้ด 6 หลักจะช้าเกินจะใช้จริงก็ตาม
+ */
+export function timingSafeEqual(a: string, b: string): boolean {
+  const left = a.trim();
+  const right = b.trim();
+  let diff = left.length ^ right.length;
+  for (let i = 0; i < left.length; i++) {
+    diff |= left.charCodeAt(i) ^ right.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+/**
+ * Escapes a user-supplied search term before it is interpolated into a
+ * PostgREST `.or()` filter string. Without this, characters like `)` `,` `.`
+ * can terminate the intended predicate and append new ones, and `%` `_` act
+ * as SQL LIKE wildcards.
+ */
+export function sanitizeSearch(
+  value: string | string[] | undefined | null
+): string {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return (raw ?? "")
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .trim()
+    .slice(0, MAX_LENGTHS.shortText)
+    .replace(/\\/g, "\\\\")
+    .replace(/[%_,().*'"\t=]/g, (ch) => `\\${ch}`)
+    .trim();
 }

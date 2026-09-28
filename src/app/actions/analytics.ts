@@ -11,8 +11,11 @@ export async function fetchAlarmTrend(days = 14): Promise<TrendResponse> {
   if (!user) return { error: "ยังไม่ได้เข้าสู่ระบบ" };
   const supabase = await createClient();
 
+  // จำกัดช่วงวันจากฝั่ง client ไว้ ไม่งั้นอาจถูกเรียกด้วยค่ามหาศาล
+  const span = Math.min(Math.max(Math.trunc(Number(days) || 14), 1), 365);
+
   const now = new Date();
-  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (days - 1));
+  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (span - 1));
 
   const { data, error } = await supabase
     .from("alarms")
@@ -26,7 +29,7 @@ export async function fetchAlarmTrend(days = 14): Promise<TrendResponse> {
   return {
     points: buildAlarmTrend(
       (data ?? []) as { occurred_at: string; status: string }[],
-      days,
+      span,
       now
     ),
     at: Date.now(),

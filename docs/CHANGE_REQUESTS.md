@@ -11,7 +11,8 @@
 | 4 | เพิ่ม **กราฟจำนวน Alarm** | ✅ เสร็จ | `src/components/alarm-trend-chart.tsx` (กราฟแท่ง SVG 14 วัน แยกสีตามสถานะ) + `src/lib/analytics.ts` |
 | 5 | เพิ่มหน้า **Machine History** | ✅ เสร็จ | `src/app/(app)/machines/[id]/page.tsx` แสดงประวัติ Alarm และงานบำรุงรักษาของเครื่องจักร |
 | 6 | เพิ่ม **Validation เพิ่มเติม** | ✅ เสร็จ | `src/lib/validation.ts` (ความยาว, รูปแบบวันที่, อีเมล, Machine ID ห้ามมีช่องว่าง) + `tests/validation.test.ts` |
-| 7 | เพิ่ม **Function ใหม่ตาม Requirement ทุกหนด** | ✅ เสร็จ | ดูรายละเอียดด้านล่าง |
+| 7 | เพิ่ม **Function ใหม่ตาม Requirement ทุกหนด** | ✅ เสร็จ | ดูตาราง Route → Server Action ในหัวข้อ "Function ที่ใช้ในระบบ" ของ `README.md` |
+| 8 | รีเซ็ตรหัสผ่าน **ไม่ต้องส่งอีเมล** | ✅ เสร็จ | `supabase/reset_codes.sql` (ตาราง `password_reset_codes`), `generateResetCodeAction` ใน `src/app/actions/admin.ts`, `requestPasswordResetAction` ใน `src/app/actions/auth.ts`, `src/app/(app)/admin/users/reset-code-button.tsx` |
 
 ## 7. ฟีเจอร์โบนัสที่เพิ่มเพิ่ม (หัวข้อ 7)
 
@@ -25,11 +26,43 @@
 | **Notification** | ✅ | `src/lib/notifications.ts`, `src/components/notification-bell.tsx` (กระดิ่ง + จุดแดง + อ่านแล้วทั้งหมด) |
 | **Audit Log** | ✅ | ตาราง `audit_log` + trigger + หน้า `/admin/audit` |
 | **Responsive UI / Dark Mode** | ✅ | `src/components/app-shell.tsx` (Drawer มือถือ), `src/components/theme-toggle.tsx` |
+| **รีเซ็ตรหัสผ่านด้วยโค้ดจาก Admin** (ไม่ต้องส่งอีเมล) | ✅ | `supabase/reset_codes.sql`, หน้า `/admin/users`, โหมด "ลืมรหัสผ่าน?" ที่หน้า `/login` |
+| แสดง **อีเมล** ของผู้ใช้ในหน้า Admin | ✅ | `listUserEmails()` ใน `src/utils/supabase/admin.ts` + คอลัมน์อีเมลใน `src/app/(app)/admin/users/page.tsx` |
+
+## หมายเหตุ: ทำไมถึงเลิกใช้อีเมลในการรีเซ็ตรหัสผ่าน
+
+SMTP ของ Supabase (แผน free) ส่งอีเมลได้เฉพาะผู้ดูแลโปรเจกต์เท่านั้น
+ถ้าใช้ลิงก์รีเซ็ตทางอีเมล ผู้ประเมินหรือช่างในโรงงานจะไม่มีอีเมลให้เข้าถึง
+ระบบจึงเปลี่ยนมาใช้ **โค้ดรีเซ็ต 6 หลักที่ Admin เป็นคนออกให้** แทน
+
+| หัวข้อ | วิธีรับป้องกัน |
+| --- | --- |
+| ใครก็รีเซ็ตรหัสของคนอื่นได้ | โค้ดต้องออกโหมด Admin เท่านั้น (`generateResetCodeAction` เรียก `requireAdmin()`) |
+| เดาโค้ดทีละหลัก | กรอกผิดได้ไม่เกิน 5 ครั้ง แล้วโค้ดถูกเผา (`RESET_CODE_MAX_ATTEMPTS`) |
+| โค้ดหมดอายุ | `expires_at` = 15 นาที (`RESET_CODE_TTL_MINUTES`) และใช้ได้ครั้งเดียว |
+| ใช้โค้ดเดิมซ้ำ | `used_at` ถูกตั้งทันทีเมื่อสำเร็จ พร้อมเผาโค้ดตัวอื่นของอีเมลเดียวกัน |
+| เดาเวลาผ่านการเทียบโค้ด | `timingSafeEqual()` เทียบแบบใช้เวลาคงที่ |
+| เปิดเผยว่าอีเมลมีบัญชีจริง | ข้อความ error เป็นข้อความเดียวกันทุกกรณี |
+| แก้/อ่านโค้ดจากฝั่ง client | เปิด RLS และไม่มี policy สำหรับ insert/update — เข้าถึงได้เฉพาะ Server Action ที่ใช้ service role key |
+| โค้ดซ้ำในฐานข้อมูล | `code_hash` มี `unique` constraint + สุ่มด้วย `crypto.randomInt()` + ลองใหม่เมื่อชน |
+| ฐานข้อมูลรั่วแล้วเอาโค้ดไปใช้ได้ | เก็บเป็น SHA-256 hash ปน `RESET_CODE_PEPPER` ไม่เก็บโค้ดจริง (`src/lib/reset-code.ts`) |
+| โค้ดโผล่ใน Audit Log | แถวข้อมูลไม่มีโค้ดจริงอยู่แล้ว ต่อให้ trigger บันทึก before/after ก็ไม่รั่ว |
+| ตรวจสอบย้อนหลัง | trigger `log_audit_event` บันทึกลง `audit_log` (เห็นได้ในหน้า `/admin/audit`) |
+
+### ข้อจำกัดที่ต้องรู้
+
+- **ยังไม่มี rate limit ต่อ IP/อีเมล** ที่ระดับแอป ปัจจุบันการกันเดาโค้ดทำได้แค่ระดับโค้ด
+  (5 ครั้งต่อ 1 โค้ด) ถ้านำขึ้นใช้จริงควรเพิ่ม rate limit ที่ Vercel/Upstash ด้วย
+- **โค้ดเดิมยังใช้ได้อยู่หลังรีเซ็ตสำเร็จของอีกคน** ถ้า Admin ออกโค้ดให้คนละอีเมล
+  ระบบจะเผาเฉพาะโค้ดของอีเมลที่เพิ่งรีเซ็ตสำเร็จ
+- **รหัสผ่านเดิมของ session ที่ล็อกอินอยู่ยังใช้ได้** การเปลี่ยนรหัสผ่านไม่ได้บังคับ logout
+  session อื่นของบัญชีนั้น (Supabase ต้องเรียก sign out แบบ global ซึ่งยังไม่ได้ทำ)
 
 ## หมายเหตุสำหรับการเปลี่ยนแปลงเพิ่มเติมในอนาคต
 
 - **เพิ่มสถานะใหม่:** แก้ `check` constraint ใน `supabase/schema.sql` + เพิ่มค่าใน `src/lib/types.ts`
-  (หน้าจอจะแสดงสีใหม่ให้อัตโนมัติ ให้เพิ่มสีใน `src/components/status-badge.tsx`)
+  (ถ้าต้องการสีเฉพาะ ให้เพิ่มกรณีใน `src/components/status-badge.tsx` — ถ้าไม่เพิ่ม
+  หน้าจอจะใช้สีเทาสำรอง `bg-zinc-100` ให้อัตโนมัติ)
 - **เพิ่มฟิลด์ในตาราง:** แก้ schema + เพิ่มช่องในฟอร์ม (`*-form.tsx`) + เพิ่มคอลัมน์ในหน้าตาราง
   + เพิ่ม validation ใน `src/lib/validation.ts` + เพิ่มเทสต์
 - **เพิ่ม Role ใหม่:** เพิ่มใน `check` constraint ของ `profiles` และใน `src/lib/permissions.ts` (จุดเดียวที่ต้องแก้)

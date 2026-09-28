@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { requireUser } from "@/utils/auth";
 import { buildCsv } from "@/lib/csv";
+import { sanitizeSearch } from "@/lib/validation";
 
 export type CsvKind = "machines" | "alarms" | "maintenance";
 export type CsvFilters = {
@@ -23,6 +24,9 @@ function str(v: unknown): string | null {
 function inList(v: string | null, list: readonly string[]): string | null {
   return v && (list as readonly string[]).includes(v) ? v : null;
 }
+
+/** จำกัดจำนวนแถวสูงสุดต่อการ export เพื่อไม่ให้หน่วยความจำตัวเครื่องระเบิด */
+const EXPORT_LIMIT = 10_000;
 
 function formatDateTime(value: string | null | undefined): string {
   if (!value) return "";
@@ -49,9 +53,10 @@ export async function exportCsv(
     const query = supabase
       .from("machines")
       .select("*")
-      .order("machine_id", { ascending: true });
+      .order("machine_id", { ascending: true })
+      .limit(EXPORT_LIMIT);
 
-    const q = str(filters.q);
+    const q = sanitizeSearch(filters.q) || null;
     const status = inList(str(filters.status), [
       "Running",
       "Stop",
@@ -97,9 +102,10 @@ export async function exportCsv(
     const query = supabase
       .from("alarms")
       .select("*")
-      .order("occurred_at", { ascending: false });
+      .order("occurred_at", { ascending: false })
+      .limit(EXPORT_LIMIT);
 
-    const q = str(filters.q);
+    const q = sanitizeSearch(filters.q) || null;
     const status = inList(str(filters.status), ["Open", "In Progress", "Closed"]);
     const machineId = str(filters.machine);
     const from = str(filters.from);
@@ -142,9 +148,10 @@ export async function exportCsv(
   const query = supabase
     .from("maintenance_records")
     .select("*")
-    .order("maintenance_date", { ascending: false });
+    .order("maintenance_date", { ascending: false })
+    .limit(EXPORT_LIMIT);
 
-  const q = str(filters.q);
+  const q = sanitizeSearch(filters.q) || null;
   const status = inList(str(filters.status), [
     "Scheduled",
     "In Progress",
@@ -152,7 +159,7 @@ export async function exportCsv(
     "Waiting Part",
   ]);
   const machineId = str(filters.machine);
-  const technician = str(filters.technician);
+  const technician = sanitizeSearch(filters.technician) || null;
   const from = str(filters.from);
   const to = str(filters.to);
 

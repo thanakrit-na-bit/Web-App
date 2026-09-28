@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { requireUser } from "@/utils/auth";
 import { MACHINE_STATUSES, type Machine } from "@/lib/types";
 import { can } from "@/lib/permissions";
+import { sanitizeSearch } from "@/lib/validation";
 import { StatusBadge } from "@/components/status-badge";
 import { ExportCsvButton } from "@/components/export-csv-button";
 import { EmptyState } from "@/components/empty-state";
@@ -24,7 +25,7 @@ export default async function MachinesPage(props: PageProps<"/machines">) {
     .select("*")
     .order("machine_id", { ascending: true });
 
-  const search = typeof q === "string" && q.trim() ? q.trim() : null;
+  const search = sanitizeSearch(q) || null;
   const statusFilter =
     typeof status === "string" && MACHINE_STATUSES.includes(status as never)
       ? status

@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { requireUser } from "@/utils/auth";
 import { ALARM_STATUSES, type Alarm, type Machine } from "@/lib/types";
 import { can } from "@/lib/permissions";
+import { sanitizeSearch } from "@/lib/validation";
 import { StatusBadge } from "@/components/status-badge";
 import { ExportCsvButton } from "@/components/export-csv-button";
 import { EmptyState } from "@/components/empty-state";
@@ -41,8 +42,7 @@ export default async function AlarmsPage(props: PageProps<"/alarms">) {
     .select("*, machines(machine_id, machine_name)")
     .order("occurred_at", { ascending: false });
 
-  const search =
-    typeof params.q === "string" && params.q.trim() ? params.q.trim() : null;
+  const search = sanitizeSearch(params.q) || null;
   const status =
     typeof params.status === "string" && ALARM_STATUSES.includes(params.status as never)
       ? params.status

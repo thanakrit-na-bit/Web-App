@@ -29,16 +29,19 @@ async function syncMachineStatuses(
 
     if (!machine) continue;
     const hasOpen = (openAlarms ?? []).length > 0;
-    if (hasOpen && machine.status !== "Alarm") {
-      await supabase
+    // เครื่องที่ตั้ง Stop/Maintenance ไว้ต้องไม่ถูกบังคับเปลี่ยน
+    if (hasOpen && machine.status === "Running") {
+      const { error } = await supabase
         .from("machines")
         .update({ status: "Alarm" })
         .eq("id", machineId);
+      if (error) console.error("sync machine status -> Alarm:", error.message);
     } else if (!hasOpen && machine.status === "Alarm") {
-      await supabase
+      const { error } = await supabase
         .from("machines")
         .update({ status: "Running" })
         .eq("id", machineId);
+      if (error) console.error("sync machine status -> Running:", error.message);
     }
   }
 }

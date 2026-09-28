@@ -93,6 +93,9 @@ create table if not exists public.audit_log (
   created_at timestamptz not null default now()
 );
 
+create index if not exists audit_log_created_at_idx on public.audit_log (created_at desc);
+create index if not exists audit_log_target_id_idx on public.audit_log (target_id);
+
 alter table public.audit_log enable row level security;
 
 drop policy if exists "audit_log_select_admin" on public.audit_log;

@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   MAX_LENGTHS,
+  RESET_CODE_LENGTH,
+  RESET_CODE_MAX_ATTEMPTS,
+  RESET_CODE_TTL_MINUTES,
   isValidEmail,
   isValidPassword,
+  isValidResetCode,
+  sanitizeSearch,
+  timingSafeEqual,
   validateAlarm,
   validateMachine,
   validateMaintenance,
@@ -218,5 +224,111 @@ describe("isValidEmail / isValidPassword", () => {
   it("ตรวจความยาวรหัสผ่านอย่างน้อย 6 ตัวอักษร", () => {
     expect(isValidPassword("12345")).toBe(false);
     expect(isValidPassword("123456")).toBe(true);
+  });
+});
+
+describe("sanitizeSearch", () => {
+  it("คืนค่าว่างเมื่อไม่มีคำค้น", () => {
+    expect(sanitizeSearch(undefined)).toBe("");
+    expect(sanitizeSearch(null)).toBe("");
+    expect(sanitizeSearch("")).toBe("");
+    expect(sanitizeSearch("   ")).toBe("");
+  });
+
+  it("รองรับค่าจาก searchParams ที่เป็น array", () => {
+    expect(sanitizeSearch(["M-001", "M-002"])).toBe("M-001");
+    expect(sanitizeSearch([])).toBe("");
+  });
+
+  it("ปล่อยคำค้นปกติที่ไม่มีอักขระพิเศษผ่าน", () => {
+    expect(sanitizeSearch("M-001")).toBe("M-001");
+    expect(sanitizeSearch("  CNC Lathe 1  ")).toBe("CNC Lathe 1");
+    expect(sanitizeSearch("เครื่องจักร หมายเลข 1")).toBe("เครื่องจักร หมายเลข 1");
+  });
+
+  it("escape เครื่องหมายที่ PostgREST .or() ใช้เป็นไวยากรณ์", () => {
+    expect(sanitizeSearch("a,b")).toBe("a\\,b");
+    expect(sanitizeSearch("a.b")).toBe("a\\.b");
+    expect(sanitizeSearch("a)or(1=1")).toBe("a\\)or\\(1\\=1");
+    expect(sanitizeSearch("name.eq.admin")).toBe("name\\.eq\\.admin");
+  });
+
+  it("escape wildcard ของ LIKE เพื่อไม่ให้ผู้ใช้ใช้ % หรือ _", () => {
+    expect(sanitizeSearch("100%")).toBe("100\\%");
+    expect(sanitizeSearch("a_b")).toBe("a\\_b");
+  });
+
+  it("escape เครื่องหมาย quote และ backslash", () => {
+    expect(sanitizeSearch(`O'Brien`)).toBe("O\\'Brien");
+    expect(sanitizeSearch('say "hi"')).toBe('say \\"hi\\"');
+    expect(sanitizeSearch("a\\b")).toBe("a\\\\b");
+  });
+
+  it("ไม่ทิ้ง backslash ค้างท้ายเมื่อคำค้นยาวเกินกำหนด", () => {
+    const result = sanitizeSearch("%".repeat(MAX_LENGTHS.shortText + 50));
+    expect(result).toHaveLength(MAX_LENGTHS.shortText * 2);
+    expect(result.endsWith("\\")).toBe(false);
+  });
+
+  it("ตัดความยาวที่เกินกำหนด", () => {
+    expect(sanitizeSearch("a".repeat(MAX_LENGTHS.shortText + 10))).toHaveLength(
+      MAX_LENGTHS.shortText
+    );
+  });
+
+  it("แทน control character ด้วยช่องว่าง", () => {
+    expect(sanitizeSearch("M-00\u00001")).toBe("M-00 1");
+    expect(sanitizeSearch("line\nbreak")).toBe("line break");
+    expect(sanitizeSearch("tab\there")).toBe("tab here");
+  });
+});
+
+describe("isValidResetCode", () => {
+  it("รับเฉพาะตัวเลข 6 หลัก", () => {
+    expect(isValidResetCode("483920")).toBe(true);
+    expect(isValidResetCode("000000")).toBe(true);
+    expect(isValidResetCode("  483920  ")).toBe(true);
+  });
+
+  it("ปฏิเสธความยาวผิด", () => {
+    expect(isValidResetCode("48392")).toBe(false);
+    expect(isValidResetCode("4839201")).toBe(false);
+    expect(isValidResetCode("")).toBe(false);
+  });
+
+  it("ปฏิเสธตัวอักษรและเครื่องหมายแทรก", () => {
+    expect(isValidResetCode("48392a")).toBe(false);
+    expect(isValidResetCode("48 920")).toBe(false);
+    expect(isValidResetCode("483-920")).toBe(false);
+    expect(isValidResetCode("48392.")).toBe(false);
+  });
+
+  it("ความยาวต้องตรงกับ RESET_CODE_LENGTH เสมอ", () => {
+    expect(RESET_CODE_LENGTH).toBe(6);
+    expect(isValidResetCode("1".repeat(RESET_CODE_LENGTH + 1))).toBe(false);
+  });
+});
+
+describe("timingSafeEqual", () => {
+  it("เทียบโค้ดที่ตรงกันได้", () => {
+    expect(timingSafeEqual("483920", "483920")).toBe(true);
+    expect(timingSafeEqual(" 483920 ", "483920")).toBe(true);
+  });
+
+  it("เทียบโค้ดที่ไม่ตรงได้", () => {
+    expect(timingSafeEqual("483920", "483921")).toBe(false);
+    expect(timingSafeEqual("483920", "183920")).toBe(false);
+    expect(timingSafeEqual("483920", "48392")).toBe(false);
+    expect(timingSafeEqual("483920", "")).toBe(false);
+    expect(timingSafeEqual("", "")).toBe(true);
+  });
+});
+
+describe("ค่าคงที่โค้ดรีเซ็ตรหัสผ่าน", () => {
+  it("อายุโค้ดและจำนวนครั้งที่ลองผิดได้อยู่ในช่วงที่สมเหตุสมผล", () => {
+    expect(RESET_CODE_TTL_MINUTES).toBeGreaterThan(0);
+    expect(RESET_CODE_TTL_MINUTES).toBeLessThanOrEqual(60);
+    expect(RESET_CODE_MAX_ATTEMPTS).toBeGreaterThan(0);
+    expect(RESET_CODE_MAX_ATTEMPTS).toBeLessThanOrEqual(10);
   });
 });

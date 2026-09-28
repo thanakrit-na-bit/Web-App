@@ -45,7 +45,7 @@ export function AuthForm() {
         </h1>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           {isForgot
-            ? "รีเซ็ตรหัสผ่าน"
+            ? "กรอกอีเมล รหัสรีเซ็ต และรหัสผ่านใหม่ (ไม่ต้องรับลิงก์ทางอีเมล)"
             : "ระบบจัดการ Alarm และงานบำรุงรักษา"}
         </p>
       </div>
@@ -148,7 +148,52 @@ export function AuthForm() {
               className={inputClass}
             />
           </div>
-        ) : null}
+        ) : (
+          <>
+            <div>
+              <label
+                htmlFor="code"
+                className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              >
+                รหัสรีเซ็ต (6 หลัก)
+              </label>
+              <input
+                id="code"
+                name="code"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="\d{6}"
+                maxLength={6}
+                required
+                placeholder="เช่น 483920"
+                className={`${inputClass} font-mono tracking-[0.3em]`}
+              />
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                ขอรหัสรีเซ็ตจากผู้ดูแลระบบ (Admin) ที่หน้า
+                จัดการผู้ใช้งาน โค้ดใช้ได้ครั้งเดียวและหมดอายุใน 15 นาที
+              </p>
+            </div>
+            <div>
+              <label
+                htmlFor="new_password"
+                className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              >
+                รหัสผ่านใหม่
+              </label>
+              <input
+                id="new_password"
+                name="password"
+                type="password"
+                required
+                minLength={6}
+                autoComplete="new-password"
+                placeholder="••••••••"
+                className={inputClass}
+              />
+            </div>
+          </>
+        )}
 
         {state?.error && (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/60 dark:text-red-300">
@@ -162,7 +207,7 @@ export function AuthForm() {
         )}
         {state && !state.error && mode === "forgot" && (
           <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950/60 dark:text-green-300">
-            ส่งลิงก์รีเซ็ตไปที่อีเมลแล้ว — ตรวจสอบกล่องจดหมาย (รวม Spam)
+            เปลี่ยนรหัสผ่านเรียบร้อยแล้ว กลับไปเข้าสู่ระบบด้วยรหัสใหม่ได้เลย
           </p>
         )}
 
@@ -177,7 +222,7 @@ export function AuthForm() {
               ? "เข้าสู่ระบบ"
               : mode === "signup"
                 ? "สมัครสมาชิก"
-                : "ส่งลิงก์รีเซ็ต"}
+                : "ตั้งรหัสผ่านใหม่"}
         </button>
       </form>
 

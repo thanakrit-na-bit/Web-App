@@ -18,6 +18,27 @@ export async function updateUserRole(
   }
 
   const supabase = await createClient();
+
+  // กันไม่ให้ผู้ดูแลคนสุดท้ายถูกลดสิทธิ์จนระบบไม่มีใครจัดการได้
+  if (role !== "admin") {
+    const { data: target } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (target?.role === "admin") {
+      const { count } = await supabase
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("role", "admin");
+
+      if ((count ?? 0) <= 1) {
+        return { error: "ต้องมีผู้ดูแลระบบอย่างน้อย 1 คน จึงจะลดสิทธิ์ผู้ดูแลคนนี้ได้" };
+      }
+    }
+  }
+
   const { error } = await supabase
     .from("profiles")
     .update({ role })

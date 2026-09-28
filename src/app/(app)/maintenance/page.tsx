@@ -7,6 +7,7 @@ import {
   type Maintenance,
 } from "@/lib/types";
 import { can } from "@/lib/permissions";
+import { sanitizeSearch } from "@/lib/validation";
 import { StatusBadge } from "@/components/status-badge";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
@@ -34,8 +35,7 @@ export default async function MaintenancePage(props: PageProps<"/maintenance">) 
     .select("*, machines(machine_id, machine_name)")
     .order("maintenance_date", { ascending: false });
 
-  const search =
-    typeof params.q === "string" && params.q.trim() ? params.q.trim() : null;
+  const search = sanitizeSearch(params.q) || null;
   const status =
     typeof params.status === "string" &&
     MAINTENANCE_STATUSES.includes(params.status as never)
@@ -43,10 +43,7 @@ export default async function MaintenancePage(props: PageProps<"/maintenance">) 
       : null;
   const machineId =
     typeof params.machine === "string" && params.machine ? params.machine : null;
-  const technician =
-    typeof params.technician === "string" && params.technician.trim()
-      ? params.technician.trim()
-      : null;
+  const technician = sanitizeSearch(params.technician) || null;
   const from = typeof params.from === "string" && params.from ? params.from : null;
   const to = typeof params.to === "string" && params.to ? params.to : null;
 
