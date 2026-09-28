@@ -13,6 +13,7 @@
 | 6 | เพิ่ม **Validation เพิ่มเติม** | ✅ เสร็จ | `src/lib/validation.ts` (ความยาว, รูปแบบวันที่, อีเมล, Machine ID ห้ามมีช่องว่าง) + `tests/validation.test.ts` |
 | 7 | เพิ่ม **Function ใหม่ตาม Requirement ทุกหนด** | ✅ เสร็จ | ดูตาราง Route → Server Action ในหัวข้อ "Function ที่ใช้ในระบบ" ของ `README.md` |
 | 8 | รีเซ็ตรหัสผ่าน **ไม่ต้องส่งอีเมล** | ✅ เสร็จ | `supabase/reset_codes.sql` (ตาราง `password_reset_codes`), `generateResetCodeAction` ใน `src/app/actions/admin.ts`, `requestPasswordResetAction` ใน `src/app/actions/auth.ts`, `src/app/(app)/admin/users/reset-code-button.tsx` |
+| 9 | หน้า error / 404 ภาษาไทย | ✅ เสร็จ | `src/app/(app)/error.tsx`, `src/app/global-error.tsx`, `src/app/not-found.tsx`, `src/app/loading.tsx` — ไม่ให้ผู้ใช้เจอหน้า error ดิบของ Next.js กลางงาน |
 
 ## 7. ฟีเจอร์โบนัสที่เพิ่มเพิ่ม (หัวข้อ 7)
 

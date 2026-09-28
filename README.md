@@ -65,8 +65,12 @@ alarm-maint-app/
 ├── src/
 │   ├── app/
 │   │   ├── (app)/          # หน้าหลัง login (dashboard, machines, alarms, maintenance, admin)
+│   │   │                   # + error.tsx / loading.tsx จับ error เป็นภาษาไทย
 │   │   ├── (auth)/login/   # หน้าเข้าสู่ระบบ (มีโหมดรีเซ็ตรหัสผ่านแบบใส่โค้ด)
-│   │   └── actions/        # Server Actions (ตรวจสิทธิ์ + validate ก่อนเขียน DB)
+│   │   ├── actions/        # Server Actions (ตรวจสิทธิ์ + validate ก่อนเขียน DB)
+│   │   ├── global-error.tsx# จับ error ระดับ root layout (พังแล้วยังเห็นหน้าเว็บ)
+│   │   ├── not-found.tsx   # หน้า 404 ภาษาไทย
+│   │   └── loading.tsx     # สปินเนอร์ตอนเปลี่ยนหน้า
 │   ├── components/         # UI components (app-shell, notification-bell, alarm-trend-*)
 │   ├── lib/                # types, validation, permissions, notifications, analytics, csv, chart
 │   ├── proxy.ts            # Middleware (Next.js 16)
@@ -77,9 +81,8 @@ alarm-maint-app/
 │   ├── migration_bonus.sql     # Role Viewer + ตาราง Audit Log + trigger บันทึก log
 │   ├── sync_machine_status.sql # trigger ซิงก์สถานะเครื่องจักรจาก Alarm
 │   ├── fix_policy_recursion.sql# แก้ปัญหา RLS infinite recursion (รันเป็นไฟล์สุดท้าย)
-│   └── reset_codes.sql          # ตาราง password_reset_codes (รีเซ็ตรหัสผ่านไม่ต้องส่งอีเมล)
-│
-└── supabase/fix_missing_profiles.sql # ซ่อม profile ที่หาย (บัญชีสมัครก่อน trigger ถูกสร้าง)
+│   ├── reset_codes.sql          # ตาราง password_reset_codes (รีเซ็ตรหัสผ่านไม่ต้องส่งอีเมล)
+│   └── fix_missing_profiles.sql # ซ่อม profile ที่หาย (บัญชีสมัครก่อน trigger ถูกสร้าง)
 ├── tests/                  # Vitest unit tests
 ├── vitest.config.ts
 └── .github/workflows/ci.yml
