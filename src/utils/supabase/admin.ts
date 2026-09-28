@@ -12,10 +12,15 @@ export function createAdminClient() {
 /**
  * ดึงอีเมลของผู้ใช้ทั้งหมด คืนเป็น map userId -> email
  * ใช้แสดงในหน้า /admin/users (ตาราง profiles ไม่ได้เก็บอีเมลไว้)
- * คืนค่า {} ถ้าไม่ได้ตั้ง service role key เพื่อให้หน้าเว็บยังทำงานได้
+ *
+ * คืน hasServiceRole=false ถ้าไม่ได้ตั้ง service role key เพื่อให้หน้าเว็บ
+ * แยกแยะได้ว่า "ไม่มีคีย์" กับ "ผู้ใช้ไม่มีบัญชี" และยังทำงานต่อได้
  */
-export async function listUserEmails(): Promise<Record<string, string>> {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return {};
+export async function listUserEmails(): Promise<{
+  emails: Record<string, string>;
+  hasServiceRole: boolean;
+}> {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return { emails: {}, hasServiceRole: false };
 
   const admin = createAdminClient();
   const emails: Record<string, string> = {};
@@ -31,5 +36,5 @@ export async function listUserEmails(): Promise<Record<string, string>> {
     if (data.users.length < perPage) break;
   }
 
-  return emails;
+  return { emails, hasServiceRole: true };
 }

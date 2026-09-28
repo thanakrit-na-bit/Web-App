@@ -78,6 +78,8 @@ alarm-maint-app/
 │   ├── sync_machine_status.sql # trigger ซิงก์สถานะเครื่องจักรจาก Alarm
 │   ├── fix_policy_recursion.sql# แก้ปัญหา RLS infinite recursion (รันเป็นไฟล์สุดท้าย)
 │   └── reset_codes.sql          # ตาราง password_reset_codes (รีเซ็ตรหัสผ่านไม่ต้องส่งอีเมล)
+│
+└── supabase/fix_missing_profiles.sql # ซ่อม profile ที่หาย (บัญชีสมัครก่อน trigger ถูกสร้าง)
 ├── tests/                  # Vitest unit tests
 ├── vitest.config.ts
 └── .github/workflows/ci.yml
@@ -166,10 +168,24 @@ npm run dev                  # http://localhost:3000
 2. `migration_bonus.sql` — เพิ่ม Role `viewer`, ตาราง `audit_log` และ trigger บันทึก log
 3. `sync_machine_status.sql` — trigger ซิงก์สถานะเครื่องจักรอัตโนมัติจาก Alarm
 4. `fix_policy_recursion.sql` — แก้ปัญหา RLS infinite recursion (ถ้ายังไม่ได้แก้ในไฟล์ schema)
-5. `reset_codes.sql` — ตาราง `password_reset_codes` สำหรับรีเซ็ตรหัสผ่านแบบไม่ต้องส่งอีเมล (รันลำดับใดก็ได้)
+5. `reset_codes.sql` — ตาราง `password_reset_codes` สำหรับรีเซ็ตรหัสผ่านแบบไม่ต้องส่งอีเมล
+6. `fix_missing_profiles.sql` — **รันเฉพาะกรณี** ที่บัญชีหายจากหน้า `/admin/users` (ดูหัวข้อด้านล่าง)
 
 > **ลำดับสำคัญ:** ต้องรันตามลำดับ 1 → 4 เพราะไฟล์ที่ 4 จะลบ policy แบบเปิดกว้างจากไฟล์ที่ 1 ทิ้ง
 > ถ้ารันผิดลำดับ `viewer` จะกลายเป็นผู้เขียนข้อมูลได้
+
+### บัญชีหายจากหน้า /admin/users
+
+อาการ: เข้า `/admin/users` แล้วเห็นผู้ใช้ไม่ครบ เช่น มีบัญชีในระบบ Auth 4 คน
+แต่หน้าเว็บขึ้นแค่ 2 คน
+
+สาเหตุ: บัญชีที่สมัคร **ก่อน** trigger `handle_new_user` ถูกสร้าง จะไม่มีแถวในตาราง
+`profiles` และตารางนี้คือแหล่งข้อมูลที่หน้า `/admin/users` ดึงมาแสดง
+(ถ้าใช้ query แบบ `join auth.users` กับ `profiles` บัญชีเหล่านี้จะถูกตัดทิ้งไปเงียบ ๆ)
+
+วิธีแก้: รัน `supabase/fix_missing_profiles.sql` ใน SQL Editor
+ไฟล์นี้จะแสดงรายชื่อที่ขาดก่อน แล้วสร้าง `profiles` ให้อัตโนมัติ (ถ้ายังไม่มี admin
+เลย บัญชีแรกที่ซ่อมจะได้เป็น admin) รีเฟรชหน้า `/admin/users` หลังรัน
 
 ### รีเซ็ตรหัสผ่าน (ไม่ต้องส่งอีเมล)
 

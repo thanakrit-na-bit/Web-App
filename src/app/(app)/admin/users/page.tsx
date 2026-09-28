@@ -16,7 +16,7 @@ export default async function AdminUsersPage() {
   await requireAdmin();
   const supabase = await createClient();
 
-  const [{ data: profiles, error }, emails] = await Promise.all([
+  const [{ data: profiles, error }, { emails, hasServiceRole }] = await Promise.all([
     supabase.from("profiles").select("*").order("created_at", { ascending: true }),
     listUserEmails(),
   ]);
@@ -32,6 +32,14 @@ export default async function AdminUsersPage() {
 
   const rows = (profiles ?? []) as Profile[];
 
+  // บัญชีใน auth.users ที่ไม่มีแถวใน profiles จะไม่โผล่ในตารางนี้เลย
+  // เช็คจากรายการอีเมลที่โหลดได้ เพื่อบอกผู้ดูแลว่ามีบัญชีหลุดหรือเปล่า
+  const orphanCount = hasServiceRole
+    ? Object.keys(emails).filter((id) => !rows.some((p) => p.id === id)).length
+    : 0;
+  const missingEmail = hasServiceRole ? rows.filter((p) => !emails[p.id]).length : 0;
+
+
   return (
     <div className="space-y-5">
       <PageHeader
@@ -46,6 +54,30 @@ export default async function AdminUsersPage() {
         แล้วส่งโค้ด 6 หลักให้ผู้ใช้ไปกรอกที่หน้าเข้าสู่ระบบใต้ปุ่ม
         &quot;ลืมรหัสผ่าน?&quot; โค้ดใช้ได้ครั้งเดียวและหมดอายุใน 15 นาที
       </p>
+
+      {!hasServiceRole && (
+        <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          ยังไม่ได้ตั้งค่า <code>SUPABASE_SERVICE_ROLE_KEY</code>{" "}
+          คอลัมน์อีเมลจึงแสดงเป็น &quot;-&quot; และฟีเจอร์ออกโค้ดรีเซ็ตจะใช้ไม่ได้
+          ตั้งค่าใน Vercel → Settings → Environment Variables แล้ว redeploy
+        </p>
+      )}
+
+      {hasServiceRole && orphanCount > 0 && (
+        <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          พบ <strong>{orphanCount}</strong> บัญชีในระบบ Auth ที่ไม่มีแถวในตาราง{" "}
+          <code>profiles</code> จึงไม่ปรากฏในตารางนี้ — รัน{" "}
+          <code>supabase/fix_missing_profiles.sql</code> ใน Supabase SQL Editor
+          เพื่อกู้คืน แล้วรีเฟรชหน้านี้
+        </p>
+      )}
+
+      {hasServiceRole && missingEmail > 0 && (
+        <p className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
+          มี <strong>{missingEmail}</strong> แถวใน <code>profiles</code>{" "}
+          ที่ไม่พบบัญชีในระบบ Auth (แถวที่แสดงเป็น &quot;-&quot;) — บัญชีเหล่านี้เข้าสู่ระบบไม่ได้
+        </p>
+      )}
 
       <div className="surface animate-rise overflow-hidden">
         <div className="scroll-slim overflow-x-auto">
@@ -78,7 +110,11 @@ export default async function AdminUsersPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">
-                      {emails[p.id] ?? "-"}
+                      {emails[p.id] ?? (
+                        <span className="text-amber-600 dark:text-amber-400">
+                          - ไม่พบบัญชี
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <RoleSelect userId={p.id} role={p.role} />
