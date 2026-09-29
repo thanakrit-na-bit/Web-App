@@ -6,7 +6,7 @@
 | 2 | Vercel Deployment URL | ✅ | https://alarm-maint-app.vercel.app |
 | 3 | Supabase Database Schema | ✅ | `supabase/schema.sql`, `supabase/migration_bonus.sql`, `supabase/sync_machine_status.sql`, `supabase/fix_policy_recursion.sql`, `supabase/reset_codes.sql`, `supabase/fix_missing_profiles.sql` + สรุปใน README |
 | 4 | README | ✅ | `README.md` (เทคโนโลยี, ฟีเจอร์, โครงสร้าง, Database Structure, วิธีติดตั้ง, การทดสอบ, การใช้ AI) |
-| 5 | Screenshot หน้าจอระบบ | ⚠️ ต้องถ่ายเอง | ดูคำสั่งด้านล่าง → บันทึกในโฟลเดอร์นี้ |
+| 5 | Screenshot หน้าจอระบบ | ✅ | อยู่ในโฟลเดอร์ `screenshots/` (11 ภาพ — ถ่ายจากเว็บจริงที่ความกว้าง 1440px + ภาพมือถือ) |
 | 6 | รายงานการใช้ AI | ✅ | `docs/AI_USAGE_REPORT.md` (สรุปย่อใน README หัวข้อ "การใช้งาน AI ในการพัฒนา") |
 | 7 | เอกสาร Change Request / โบนัส | ✅ | `docs/CHANGE_REQUESTS.md` |
 
