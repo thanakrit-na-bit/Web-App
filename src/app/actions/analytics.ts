@@ -2,7 +2,8 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { getCurrentUser } from "@/utils/auth";
-import { buildAlarmTrend, type TrendPoint } from "@/lib/analytics";
+import { buildAlarmTrend, toDateKey, type TrendPoint } from "@/lib/analytics";
+import { addDaysToKey, startOfDayFromKey } from "@/lib/time";
 
 export type TrendResponse = { points: TrendPoint[]; at: number } | { error: string };
 
@@ -15,7 +16,7 @@ export async function fetchAlarmTrend(days = 14): Promise<TrendResponse> {
   const span = Math.min(Math.max(Math.trunc(Number(days) || 14), 1), 365);
 
   const now = new Date();
-  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (span - 1));
+  const from = startOfDayFromKey(addDaysToKey(toDateKey(now), -(span - 1)));
 
   const { data, error } = await supabase
     .from("alarms")

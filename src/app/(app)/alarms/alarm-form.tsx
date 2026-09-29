@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { addAlarm, updateAlarm } from "@/app/actions/alarms";
 import { ALARM_STATUSES, type Alarm, type Machine } from "@/lib/types";
+import { toDateTimeLocalValue } from "@/lib/time";
 import { Modal } from "@/components/modal";
 
 const inputClass = "field";
@@ -120,7 +121,7 @@ export function AlarmForm({
                     type="datetime-local"
                     defaultValue={
                       alarm?.occurred_at
-                        ? new Date(alarm.occurred_at).toISOString().slice(0, 16)
+                        ? toDateTimeLocalValue(alarm.occurred_at)
                         : ""
                     }
                     className={inputClass}

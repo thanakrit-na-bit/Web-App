@@ -8,6 +8,7 @@ import {
   type Machine,
   type Maintenance,
 } from "@/lib/types";
+import { toDateInputValue } from "@/lib/time";
 import { Modal } from "@/components/modal";
 
 const inputClass = "field";
@@ -133,8 +134,7 @@ export function MaintenanceForm({
                     name="maintenance_date"
                     type="date"
                     defaultValue={
-                      record?.maintenance_date ??
-                      new Date().toISOString().slice(0, 10)
+                      record?.maintenance_date ?? toDateInputValue(new Date())
                     }
                     className={inputClass}
                   />

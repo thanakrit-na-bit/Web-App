@@ -3,19 +3,10 @@ import { createClient } from "@/utils/supabase/server";
 import type { AuditLog } from "@/lib/types";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { formatDateTime as formatDateTimeLocal } from "@/lib/time";
 
 function formatDateTime(value: string) {
-  const d = new Date(value);
-  return Number.isNaN(d.getTime())
-    ? "-"
-    : d.toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
+  return formatDateTimeLocal(value);
 }
 
 function actionColor(action: string) {

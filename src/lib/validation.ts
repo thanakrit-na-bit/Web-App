@@ -6,6 +6,7 @@ import {
   type MachineStatus,
   type MaintenanceStatus,
 } from "@/lib/types";
+import { toDateInputValue } from "@/lib/time";
 
 export type ValidationResult<T> =
   | { ok: true; data: T }
@@ -193,7 +194,7 @@ export function validateMaintenance(
       problem,
       action_taken,
       technician: technician || null,
-      maintenance_date: maintenanceDate || new Date().toISOString().slice(0, 10),
+      maintenance_date: maintenanceDate || toDateInputValue(new Date()),
       status,
     },
   };

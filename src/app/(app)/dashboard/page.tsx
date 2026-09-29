@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Icon } from "@/components/icon";
 import { buildAlarmTrend, buildStatusSummary } from "@/lib/analytics";
+import { APP_TIMEZONE } from "@/lib/time";
 import { buildNotifications } from "@/lib/notifications";
 import type { Alarm, Maintenance } from "@/lib/types";
 
@@ -85,6 +86,19 @@ function StatusBar({
       ))}
     </div>
   );
+}
+
+function formatDateTimeShort(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: APP_TIMEZONE,
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
 }
 
 export default async function DashboardPage() {
@@ -248,12 +262,7 @@ export default async function DashboardPage() {
                       {a.alarm_code} · {a.machines?.machine_id}
                     </p>
                     <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                      {new Date(a.occurred_at).toLocaleString("en-GB", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {formatDateTimeShort(a.occurred_at)}
                     </p>
                   </div>
                   <StatusBadge status={a.status} />

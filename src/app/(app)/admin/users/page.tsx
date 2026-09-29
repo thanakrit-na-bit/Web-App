@@ -2,6 +2,7 @@ import { requireAdmin } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 import { listUserEmails } from "@/utils/supabase/admin";
 import type { Profile } from "@/lib/types";
+import { formatDateOnly } from "@/lib/time";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { RoleSelect } from "./role-select";
@@ -9,7 +10,7 @@ import { ResetPasswordButton } from "./reset-password-button";
 import { ResetCodeButton } from "./reset-code-button";
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-GB");
+  return formatDateOnly(value);
 }
 
 export default async function AdminUsersPage() {

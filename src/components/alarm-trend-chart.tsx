@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import type { TrendPoint } from "@/lib/analytics";
+import { AlarmTrendBars } from "@/components/alarm-trend-bars";
 import { AlarmTrendLinear } from "@/components/alarm-trend-linear";
 import { AlarmTrendRadial } from "@/components/alarm-trend-radial";
 
-type View = "radial" | "linear";
+type View = "bars" | "linear" | "radial";
 
 const VIEWS: { key: View; label: string }[] = [
-  { key: "radial", label: "วงกลม" },
+  { key: "bars", label: "แท่ง" },
   { key: "linear", label: "เส้น" },
+  { key: "radial", label: "วงกลม" },
 ];
 
 export function AlarmTrendChart({ points }: { points: TrendPoint[] }) {
-  const [view, setView] = useState<View>("radial");
+  const [view, setView] = useState<View>("bars");
 
   return (
     <div>
@@ -41,10 +43,12 @@ export function AlarmTrendChart({ points }: { points: TrendPoint[] }) {
         </div>
       </div>
 
-      {view === "radial" ? (
-        <AlarmTrendRadial points={points} />
-      ) : (
+      {view === "bars" ? (
+        <AlarmTrendBars points={points} />
+      ) : view === "linear" ? (
         <AlarmTrendLinear points={points} />
+      ) : (
+        <AlarmTrendRadial points={points} />
       )}
     </div>
   );

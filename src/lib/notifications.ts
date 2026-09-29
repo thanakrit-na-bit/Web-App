@@ -111,7 +111,7 @@ export function buildNotifications({
     if (record.status !== "Scheduled") continue;
     if (!record.maintenance_date || record.maintenance_date >= today) continue;
 
-    const overdue = daysBetween(new Date(`${record.maintenance_date}T00:00:00`), now);
+    const overdue = daysBetween(record.maintenance_date, now);
     items.push({
       id: `maintenance-${record.id}`,
       kind: "maintenance",

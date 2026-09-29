@@ -8,7 +8,7 @@
 | 1 | เพิ่มสถานะ **Waiting Part** | ✅ เสร็จ | `supabase/schema.sql` (check constraint), `src/lib/types.ts` (`MAINTENANCE_STATUSES`), หน้า Maintenance, SQL editor สีส้ม |
 | 2 | เพิ่ม **Filter ตามช่วงวันที่** | ✅ เสร็จ | `src/app/(app)/alarms/page.tsx` (`from`/`to` → `gte`/`lte`), `src/app/(app)/maintenance/page.tsx` และหน้า Export CSV |
 | 3 | เพิ่มข้อมูล **Technician** | ✅ เสร็จ | คอลัมน์ `technician` ใน `maintenance_records`, ช่องกรองช่างผู้ซ่อม, แสดงชื่อช่างในตาราง/CSV |
-| 4 | เพิ่ม **กราฟจำนวน Alarm** | ✅ เสร็จ | `src/components/alarm-trend-chart.tsx` (กราฟแท่ง SVG 14 วัน แยกสีตามสถานะ) + `src/lib/analytics.ts` |
+| 4 | เพิ่ม **กราฟจำนวน Alarm** | ✅ เสร็จ | `src/components/alarm-trend-bars.tsx` (กราฟแท่ง SVG 14 วัน แยกสีตามสถานะ Open/In Progress/Closed, ค่าเริ่มต้นของหน้า Dashboard) + `src/lib/analytics.ts` |
 | 5 | เพิ่มหน้า **Machine History** | ✅ เสร็จ | `src/app/(app)/machines/[id]/page.tsx` แสดงประวัติ Alarm และงานบำรุงรักษาของเครื่องจักร |
 | 6 | เพิ่ม **Validation เพิ่มเติม** | ✅ เสร็จ | `src/lib/validation.ts` (ความยาว, รูปแบบวันที่, อีเมล, Machine ID ห้ามมีช่องว่าง) + `tests/validation.test.ts` |
 | 7 | เพิ่ม **Function ใหม่ตาม Requirement ทุกหนด** | ✅ เสร็จ | ดูตาราง Route → Server Action ในหัวข้อ "Function ที่ใช้ในระบบ" ของ `README.md` |
@@ -20,7 +20,7 @@
 | โบนัส | สถานะ | ที่อยู่ของโค้ด |
 | --- | --- | --- |
 | เพิ่ม Role **Viewer** | ✅ | `supabase/migration_bonus.sql`, `src/lib/permissions.ts`, เมนู/ปุ่มถูกซ่อนในหน้าจอ |
-| เพิ่ม **กราฟวิเคราะห์ Alarm** | ✅ | `src/components/alarm-trend-chart.tsx`, `src/lib/analytics.ts` |
+| เพิ่ม **กราฟวิเคราะห์ Alarm** | ✅ | `src/components/alarm-trend-chart.tsx` (สลับแท่ง/เส้น/วงกลม), `src/components/alarm-trend-bars.tsx`, `src/lib/analytics.ts` |
 | เพิ่ม **Machine History** | ✅ | `src/app/(app)/machines/[id]/page.tsx` |
 | เพิ่ม **Filter ขั้นสูง** (วันที่/เครื่องจักร/ช่างผู้ซ่อม) | ✅ | หน้า Alarms, Maintenance, Machines |
 | **Export CSV / Excel** | ✅ | `src/app/actions/export.ts`, `src/lib/csv.ts` (BOM รองรับภาษาไทยใน Excel) |

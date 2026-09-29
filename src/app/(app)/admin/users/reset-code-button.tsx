@@ -2,12 +2,11 @@
 
 import { useActionState } from "react";
 import { generateResetCodeAction } from "@/app/actions/admin";
+import { formatTime } from "@/lib/time";
 
 function formatExpiry(value?: string) {
   if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" });
+  return formatTime(value);
 }
 
 export function ResetCodeButton({ userId }: { userId: string }) {

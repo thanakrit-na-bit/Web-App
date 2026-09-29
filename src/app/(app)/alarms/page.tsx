@@ -4,6 +4,7 @@ import { requireUser } from "@/utils/auth";
 import { ALARM_STATUSES, type Alarm, type Machine } from "@/lib/types";
 import { can } from "@/lib/permissions";
 import { sanitizeSearch } from "@/lib/validation";
+import { formatDateTime as formatDateTimeLocal } from "@/lib/time";
 import { StatusBadge } from "@/components/status-badge";
 import { ExportCsvButton } from "@/components/export-csv-button";
 import { EmptyState } from "@/components/empty-state";
@@ -16,13 +17,7 @@ const inputClass = "field";
 
 function formatDateTime(value: string | null | undefined) {
   if (!value) return "-";
-  return new Date(value).toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return formatDateTimeLocal(value);
 }
 
 export default async function AlarmsPage(props: PageProps<"/alarms">) {

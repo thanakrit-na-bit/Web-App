@@ -7,19 +7,11 @@ import { StatusBadge } from "@/components/status-badge";
 import { Card } from "@/components/card";
 import { EmptyState } from "@/components/empty-state";
 import { Icon } from "@/components/icon";
+import { formatDateTime as formatDateTimeLocal } from "@/lib/time";
 
 function formatDateTime(value: string | null | undefined) {
   if (!value) return "-";
-  const d = new Date(value);
-  return Number.isNaN(d.getTime())
-    ? "-"
-    : d.toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+  return formatDateTimeLocal(value);
 }
 
 export default async function MachineHistoryPage({

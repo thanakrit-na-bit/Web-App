@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { requireUser } from "@/utils/auth";
 import { buildCsv } from "@/lib/csv";
 import { sanitizeSearch } from "@/lib/validation";
+import { formatDateTime as formatDateTimeLocal } from "@/lib/time";
 
 export type CsvKind = "machines" | "alarms" | "maintenance";
 export type CsvFilters = {
@@ -31,15 +32,7 @@ const EXPORT_LIMIT = 10_000;
 function formatDateTime(value: string | null | undefined): string {
   if (!value) return "";
   const d = new Date(value);
-  return Number.isNaN(d.getTime())
-    ? ""
-    : d.toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+  return Number.isNaN(d.getTime()) ? "" : formatDateTimeLocal(value);
 }
 
 export async function exportCsv(
