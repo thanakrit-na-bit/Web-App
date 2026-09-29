@@ -39,6 +39,13 @@ dev.err
 # vercel
 .vercel
 
+# report tool (docs/report-tool)
+/docs/report-tool/node_modules/
+/docs/report-tool/report.html
+
+# zip copy of screenshots (keep off GitHub)
+/docs/screenshots/webapp.zip
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
