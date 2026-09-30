@@ -2,6 +2,16 @@
 
 ระบบจัดการเครื่องจักร แจ้งเตือน (Alarm) และงานบำรุงรักษา (Maintenance) สำหรับรายวิชา Programming in Automation Systems
 
+## บัญชี Admin สำหรับเข้าใช้งาน
+
+| บทบาท | อีเมล | รหัสผ่าน | เข้าเห็นอะไรได้ |
+| --- | --- | --- | --- |
+| Admin | `admin2@gmail.com` | `admin1234` | ทุกอย่าง รวมถึงจัดการเครื่องจักร ผู้ใช้ และ Audit Log |
+
+- **URL ใช้งานจริง:** https://alarm-maint-app.vercel.app (หน้า Login: `/login`)
+- **GitHub:** https://github.com/thanakrit-na-bit/Web-App
+- บัญชีนี้เป็นบัญชีทดลองใช้งานสำหรับผู้ประเมิน ไม่ใช่บัญชีจริงของผู้ใช้งาน
+
 ## Tech Stack
 
 - **Frontend:** Next.js 16 (App Router, Turbopack) + Tailwind CSS + TypeScript
@@ -169,6 +179,7 @@ npm run dev                  # http://localhost:3000
 | Viewer | `phatasanun-p@rmutp.ac.th` | ดูอย่างเดียว |
 
 > **รหัสผ่าน:** ผู้ประเมินกำหนดเอง — ทุกบัญชีสมัครผ่านหน้า `/login` และระบบนี้
+> (ถ้าต้องการบัญชีที่มีรหัสผ่านให้ใช้ทันที ใช้บัญชี Admin ในหัวข้อ "บัญชี Admin สำหรับเข้าใช้งาน" ด้านบน)
 > **ไม่ใช้อีเมล** จึงไม่ต้องยืนยันอีเมล (ตั้ง Confirm email = OFF ใน Supabase)
 
 **กฎการจัดสรรสิทธิ์**
